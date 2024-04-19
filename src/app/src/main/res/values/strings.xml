@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">StreetMeet</string>
+    <string name="service_begin">You will now receive notification</string>
+    <string name="service_end">You will not receive notification anymore</string>
 </resources>
