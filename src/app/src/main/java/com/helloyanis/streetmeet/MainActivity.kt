@@ -84,7 +84,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier, context: Context) {
 }
 
 fun getMessageFromSharedPreferences(context: Context): String{
-    val sharedPreferences = context.getSharedPreferences("StreetMeet_message", MODE_PRIVATE)
+    val sharedPreferences = context.getSharedPreferences(
+        context.getString(R.string.sharedPreferencesMessageFileName), MODE_PRIVATE)
     sharedPreferences.getString("savedMessage","Hello there") ?: {
         Toast.makeText(context, "no sharedPreferences" , Toast.LENGTH_SHORT).show()
     }
@@ -93,11 +94,13 @@ fun getMessageFromSharedPreferences(context: Context): String{
 }
 
 fun setMessageInSharedPreferences(context: Context, newMessage: String){
-    val sharedPreferences = context.getSharedPreferences("StreetMeet_message", MODE_PRIVATE)
+    val sharedPreferences = context.getSharedPreferences(
+        context.getString(R.string.sharedPreferencesMessageFileName), MODE_PRIVATE)
     with(sharedPreferences.edit()){
         putString("savedMessage",newMessage)
         apply()
     }
+
     Toast.makeText(context, "new Message saved" , Toast.LENGTH_SHORT).show()
 }
 
