@@ -1,20 +1,7 @@
 package com.helloyanis.streetmeet
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.net.wifi.aware.AttachCallback
-import android.net.wifi.aware.DiscoverySession
-import android.net.wifi.aware.DiscoverySessionCallback
-import android.net.wifi.aware.PeerHandle
-import android.net.wifi.aware.PublishConfig
-import android.net.wifi.aware.PublishDiscoverySession
-import android.net.wifi.aware.SubscribeConfig
-import android.net.wifi.aware.SubscribeDiscoverySession
-import android.net.wifi.aware.WifiAwareManager
-import android.net.wifi.aware.WifiAwareSession
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -32,12 +19,13 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -66,6 +54,11 @@ class MainActivity : ComponentActivity() {
                     val appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
                         android.Manifest.permission.NEARBY_WIFI_DEVICES
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Greeting(
+                        name = "Android",
+                        modifier = Modifier.padding(innerPadding),
+                        this
                     )
 
                     val appPermissionLauncher = rememberLauncherForActivityResult(
@@ -306,40 +299,41 @@ class MainActivity : ComponentActivity() {
                 wifiAwareScanFailed = true
             }
         }
+
+
+        stopService(Intent(this,BackgroundService::class.java))
     }
 }
 
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier, context: Context) {
+    var checked by remember {
+        mutableStateOf(false)
+    }
+
+    Column {
+        Text(
+            text = "Hello $name!",
+            modifier = modifier
+        )
+        Text(text = "Activate Background Service")
+        Switch(checked = checked, onCheckedChange = {
+            if(it){
+                context.startService(Intent(context, BackgroundService::class.java))
+                checked = true
+            }
+            else{
+                context.stopService(Intent(context,BackgroundService::class.java))
+                checked = false
+            }
+        },)
+    }
+
+}
 
 @Composable
-fun AlertDialog(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
-    confirmationText: String = "OK",
-    icon: ImageVector,
-) {
-    AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text(confirmationText)
-            }
-        }
-    )
+fun GreetingPreview() {
+    StreetMeetTheme {
+        //Greeting("Android")
+    }
 }
