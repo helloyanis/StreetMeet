@@ -1,7 +1,5 @@
 package com.helloyanis.streetmeet
 
-//noinspection SuspiciousImport
-import android.R
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
@@ -19,7 +17,7 @@ class BackgroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Toast.makeText(this, "service begin", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getText(R.string.service_begin), Toast.LENGTH_SHORT).show()
 
 
         startForeground()
@@ -28,7 +26,7 @@ class BackgroundService : Service() {
     }
 
     override fun onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getText(R.string.service_end), Toast.LENGTH_SHORT).show()
     }
 
 
@@ -40,7 +38,7 @@ class BackgroundService : Service() {
 
         startForeground(NOTIF_ID, NotificationCompat.Builder(this, NOTIF_CHANNEL_ID)
             .setOngoing(true)
-            .setSmallIcon(R.drawable.ic_dialog_alert)
+            .setSmallIcon(androidx.core.R.drawable.ic_call_answer)
             .setContentTitle("StreetMeet")
             .setContentText("scan service is running background")
             .setContentIntent(pendingIntent)
