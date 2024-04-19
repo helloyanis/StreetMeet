@@ -38,8 +38,7 @@ class WiFiDirectBroadcastReceiver(
                             Toast.LENGTH_LONG).show();
                     }
                     else -> {
-                        Toast.makeText(context, "Wi-Fi Direct OFF!!",
-                            Toast.LENGTH_LONG).show();
+                        activity.showWifiDirectDisabledDialog()
                     }
                 }
 

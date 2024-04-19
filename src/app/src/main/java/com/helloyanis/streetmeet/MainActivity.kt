@@ -10,6 +10,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,8 +19,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +35,8 @@ var receiver: BroadcastReceiver? = null
 
 
 class MainActivity : ComponentActivity() {
+
+    private var wifiDirectDisabledDialogVisible by mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,10 +44,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             StreetMeetTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    if (wifiDirectDisabledDialogVisible) {
+                        AlertDialogExample(
+                            onDismissRequest = { wifiDirectDisabledDialogVisible = false },
+                            onConfirmation = { /* Action à effectuer lors de la confirmation */ },
+                            dialogTitle = "Wi-Fi Direct désactivé",
+                            dialogText = "Veuillez activer le Wi-Fi Direct pour utiliser cette fonctionnalité.",
+                            icon = Icons.Default.Info // ou tout autre icône appropriée
+                        )
+                    } else {
+                        Greeting(
+                            name = "Android",
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
                 }
             }
         }
@@ -73,6 +89,10 @@ class MainActivity : ComponentActivity() {
         unregisterReceiver(receiver)
     }
 
+    fun showWifiDirectDisabledDialog() {
+        wifiDirectDisabledDialogVisible = true
+    }
+
 }
 
 @Composable
@@ -82,6 +102,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
+
+
 
 
 @Preview(showBackground = true)
