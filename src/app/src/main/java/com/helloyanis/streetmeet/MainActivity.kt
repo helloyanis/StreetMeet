@@ -1,47 +1,59 @@
 package com.helloyanis.streetmeet
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val postNotificationPermission =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        rememberPermissionState(permission = android.Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        TODO("VERSION.SDK_INT < TIRAMISU")
+                    }
+
+                val notificationChannel = NotificationChannel(
+                    "alertMeet",
+                    "Meet people",
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+                val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.createNotificationChannel(notificationChannel)
+                println("channel created")
+
+                val notificationService = NotificationService(this, "Yanis")
+                LaunchedEffect(key1 = true) {
+                    if (!postNotificationPermission.status.isGranted) {
+                        postNotificationPermission.launchPermissionRequest()
+                    }
+                }
+                Column(modifier = Modifier.padding(50.dp)) {
+                    Button(onClick = { notificationService.showBasicNotification() }) {
+                        Text(text = "Basic notification")
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    StreetMeetTheme {
-        Greeting("Android")
     }
 }
