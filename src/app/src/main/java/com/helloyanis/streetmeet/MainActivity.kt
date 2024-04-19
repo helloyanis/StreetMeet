@@ -1,7 +1,6 @@
 package com.helloyanis.streetmeet
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
@@ -309,8 +308,9 @@ fun Greeting(name: String, modifier: Modifier = Modifier, context: Context) {
     var checked by remember {
         mutableStateOf(false)
     }
+    val sharedPreferencesTalker = SharedPreferencesTalker(context)
     var customMessage by remember{
-        mutableStateOf(getMessageFromSharedPreferences(context))
+        mutableStateOf(sharedPreferencesTalker.getMessageFromSharedPreferences())
     }
 
     Column {
@@ -318,6 +318,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier, context: Context) {
             text = "Hello $name!",
             modifier = modifier
         )
+
+        //service en arrière plan
         Text(text = "Activate Background Service")
         Switch(
             checked = checked,
@@ -331,37 +333,20 @@ fun Greeting(name: String, modifier: Modifier = Modifier, context: Context) {
                 }
             },
         )
+
+        //message customisé
         Text("setNewMessage")
         TextField(value = customMessage, onValueChange = {
             customMessage = it
         })
-        Button(onClick = { setMessageInSharedPreferences(context,customMessage) }) {
+        Button(onClick = { sharedPreferencesTalker.setMessageInSharedPreferences(customMessage) }) {
             Text(text = "Valid Change")
         }
     }
 
 }
 
-fun getMessageFromSharedPreferences(context: Context): String{
-    val sharedPreferences = context.getSharedPreferences(
-        context.getString(R.string.sharedPreferencesMessageFileName), MODE_PRIVATE)
-    sharedPreferences.getString("savedMessage","Hello there") ?: {
-        Toast.makeText(context, "no sharedPreferences" , Toast.LENGTH_SHORT).show()
-    }
 
-    return sharedPreferences.getString("savedMessage","Hello there") ?: "Hello there"
-}
-
-fun setMessageInSharedPreferences(context: Context, newMessage: String){
-    val sharedPreferences = context.getSharedPreferences(
-        context.getString(R.string.sharedPreferencesMessageFileName), MODE_PRIVATE)
-    with(sharedPreferences.edit()){
-        putString("savedMessage",newMessage)
-        apply()
-    }
-
-    Toast.makeText(context, "new Message saved" , Toast.LENGTH_SHORT).show()
-}
 
 @Preview(showBackground = true)
 @Composable
