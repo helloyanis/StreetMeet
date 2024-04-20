@@ -23,7 +23,6 @@
         android:required="true"
         android:name="android.permission.INTERNET"/>
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -45,6 +44,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name=".WifiAwareBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.wifi.aware.action.WIFI_AWARE_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
