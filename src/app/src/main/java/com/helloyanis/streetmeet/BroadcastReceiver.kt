@@ -44,9 +44,10 @@ class WiFiDirectBroadcastReceiver(
 
             }
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
-
-                // The peer list has changed! We should probably do something about
-                // that.
+                manager.requestPeers(channel) { peers ->
+                    // Mettre à jour l'interface utilisateur avec la liste des pairs disponibles
+                    activity.updatePeerList(peers.deviceList)
+                }
 
             }
             WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {

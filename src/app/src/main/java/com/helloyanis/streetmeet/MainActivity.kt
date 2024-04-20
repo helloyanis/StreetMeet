@@ -1,10 +1,14 @@
 package com.helloyanis.streetmeet
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.IntentFilter
+import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -32,11 +36,17 @@ private val intentFilter = IntentFilter()
 private lateinit var channel: WifiP2pManager.Channel
 private lateinit var manager: WifiP2pManager
 var receiver: BroadcastReceiver? = null
+private val peers = mutableListOf<WifiP2pDevice>()
+
 
 
 class MainActivity : ComponentActivity() {
 
     private var wifiDirectDisabledDialogVisible by mutableStateOf(false)
+    private var wifiDirectScanFailed by mutableStateOf(false)
+
+
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,17 +55,20 @@ class MainActivity : ComponentActivity() {
             StreetMeetTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (wifiDirectDisabledDialogVisible) {
-                        AlertDialogExample(
+                        AlertDialog(
                             onDismissRequest = { wifiDirectDisabledDialogVisible = false },
                             onConfirmation = { /* Action à effectuer lors de la confirmation */ },
                             dialogTitle = "Wi-Fi Direct désactivé",
                             dialogText = "Veuillez activer le Wi-Fi Direct pour utiliser cette fonctionnalité.",
                             icon = Icons.Default.Info // ou tout autre icône appropriée
                         )
-                    } else {
-                        Greeting(
-                            name = "Android",
-                            modifier = Modifier.padding(innerPadding)
+                    } else  if (wifiDirectScanFailed){
+                        AlertDialog(
+                            onDismissRequest = { /*TODO*/ },
+                            onConfirmation = { /*TODO*/ },
+                            dialogTitle = "Autorisations insuffisantes",
+                            dialogText = "Veuillez activer la détection d'appareils à proximité dans les paramètres de l'application",
+                            icon = Icons.Default.Info
                         )
                     }
                 }
@@ -76,6 +89,20 @@ class MainActivity : ComponentActivity() {
         manager = getSystemService(WIFI_P2P_SERVICE) as WifiP2pManager
         channel = manager.initialize(this, mainLooper, null)
 
+        manager.discoverPeers(channel, object : WifiP2pManager.ActionListener {
+
+            override fun onSuccess() {
+                println("Success")
+            }
+
+            override fun onFailure(reasonCode: Int) {
+                println("Fail $reasonCode")
+                wifiDirectScanFailed=true
+            }
+        })
+
+
+
 
     }
     public override fun onResume() {
@@ -89,11 +116,25 @@ class MainActivity : ComponentActivity() {
         unregisterReceiver(receiver)
     }
 
+    /*
+    WIFI DIRECT FUNCTIONS
+     */
     fun showWifiDirectDisabledDialog() {
         wifiDirectDisabledDialogVisible = true
     }
 
+    fun updatePeerList(peerList: Collection<WifiP2pDevice>) {
+        for (device in peerList) {
+            println("Device Name: ${device.deviceName}, Device Address: ${device.deviceAddress}")
+            //TODO : Display in a list on the device
+        }
+    }
+
 }
+
+
+
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
@@ -116,7 +157,7 @@ fun GreetingPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlertDialogExample(
+fun AlertDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     dialogTitle: String,
@@ -142,16 +183,7 @@ fun AlertDialogExample(
                     onConfirmation()
                 }
             ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text("Dismiss")
+                Text("OK")
             }
         }
     )
