@@ -1,8 +1,10 @@
 package com.helloyanis.streetmeet
 
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import kotlin.random.Random
 
@@ -11,6 +13,17 @@ class NotificationService(
     private val name: String
 ) {
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun createChannelNotification() {
+        val notificationChannel = NotificationChannel(
+            "alertMeet",
+            "Meet people",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        notificationManager.createNotificationChannel(notificationChannel)
+        println("[INFO] Channel created")
+    }
 
     fun showBasicNotification() {
         val notification = NotificationCompat.Builder(context, "alertMeet")

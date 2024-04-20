@@ -1,7 +1,5 @@
 package com.helloyanis.streetmeet
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -33,16 +31,8 @@ class MainActivity : ComponentActivity() {
                         TODO("VERSION.SDK_INT < TIRAMISU")
                     }
 
-                val notificationChannel = NotificationChannel(
-                    "alertMeet",
-                    "Meet people",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(notificationChannel)
-                println("channel created")
-
                 val notificationService = NotificationService(this, "Yanis")
+                notificationService.createChannelNotification()
                 LaunchedEffect(key1 = true) {
                     if (!postNotificationPermission.status.isGranted) {
                         postNotificationPermission.launchPermissionRequest()
