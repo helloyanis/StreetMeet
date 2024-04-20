@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                         TODO("VERSION.SDK_INT < TIRAMISU")
                     }
 
-                val notificationService = NotificationService(this, "Yanis")
+                val notificationService = NotificationService(this)
                 notificationService.createChannelNotification()
                 LaunchedEffect(key1 = true) {
                     if (!postNotificationPermission.status.isGranted) {
@@ -39,7 +39,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 Column(modifier = Modifier.padding(50.dp)) {
-                    Button(onClick = { notificationService.showBasicNotification() }) {
+                    Button(onClick = { notificationService.showBasicNotification(
+                        "Vous avez croisé quelqu'un",
+                        "Nathan est a proximité, envoie lui un message") }) {
                         Text(text = "Basic notification")
                     }
                 }

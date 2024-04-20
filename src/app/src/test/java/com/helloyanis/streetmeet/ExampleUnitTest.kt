@@ -18,12 +18,20 @@ class ExampleUnitTest {
         val mockNotificationService = mockk<NotificationService>()
 
         every { mockNotificationService.createChannelNotification() } just runs
-        every { mockNotificationService.showBasicNotification() } just runs
+        every { mockNotificationService.showBasicNotification(
+            "Vous avez croisé quelqu'un",
+            "Nathan est a proximité, envoie lui un message") } just runs
 
         mockNotificationService.createChannelNotification()
-        mockNotificationService.showBasicNotification()
+        mockNotificationService.showBasicNotification(
+            "Vous avez croisé quelqu'un",
+            "Nathan est a proximité, envoie lui un message"
+        )
 
         verify { mockNotificationService.createChannelNotification() }
-        verify { mockNotificationService.showBasicNotification() }
+        verify { mockNotificationService.showBasicNotification(
+            "Vous avez croisé quelqu'un",
+            "Nathan est a proximité, envoie lui un message"
+        ) }
     }
 }

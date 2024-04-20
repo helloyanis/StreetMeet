@@ -9,8 +9,7 @@ import androidx.core.app.NotificationCompat
 import kotlin.random.Random
 
 class NotificationService(
-    private val context: Context,
-    private val name: String
+    private val context: Context
 ) {
     private val notificationManager = context.getSystemService(NotificationManager::class.java)
 
@@ -25,10 +24,10 @@ class NotificationService(
         println("[INFO] Channel created")
     }
 
-    fun showBasicNotification() {
+    fun showBasicNotification(title: String, content: String) {
         val notification = NotificationCompat.Builder(context, "alertMeet")
-            .setContentTitle("Vous avez croisé quelqu'un")
-            .setContentText("$name est a proximité, envoie lui un message")
+            .setContentTitle(title)
+            .setContentText(content)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
             .setAutoCancel(true)
