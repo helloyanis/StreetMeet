@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -56,26 +57,39 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
-                val appPermission = arrayOf(
-                    android.Manifest.permission.POST_NOTIFICATIONS,
-                    android.Manifest.permission.NEARBY_WIFI_DEVICES
-                )
+                if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    val appPermission = arrayOf(
+                        android.Manifest.permission.POST_NOTIFICATIONS,
+                        android.Manifest.permission.NEARBY_WIFI_DEVICES
+                    )
 
-                val appPermissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestMultiplePermissions(),
-                    onResult = { permissions ->
-                        val permissionsGranted =
-                            permissions.values.reduce { acc, isPermissionGranted ->
-                                acc && isPermissionGranted
+                    val appPermissionLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.RequestMultiplePermissions(),
+                        onResult = { permissions ->
+                            val permissionsGranted =
+                                permissions.values.reduce { acc, isPermissionGranted ->
+                                    acc && isPermissionGranted
+                                }
+
+                            if (permissionsGranted) {
+                                wifiAwareScanFailed = false
+                                val intent = Intent(
+                                    this,
+                                    MainActivity::class.java
+                                )
+                                this.startActivity(intent)
+                                this.finishAffinity()
+                            } else {
+                                wifiAwareScanFailed = true
+
                             }
-
-                        if (!permissionsGranted) {
-                            wifiAwareScanFailed = true
                         }
-                    }
-                )
+                    )
 
-                appPermissionLauncher.launch(appPermission)
+                    LaunchedEffect(Unit) {
+                        appPermissionLauncher.launch(appPermission)
+                    }
+                }
                 
                 val notificationService = NotificationService(this)
                 notificationService.createChannelNotification()
@@ -119,12 +133,14 @@ class MainActivity : ComponentActivity() {
                         AlertDialog(
                             onDismissRequest = { wifiAwareScanFailed = false },
                             onConfirmation = {
-                                /* TODO */
+                                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", packageName, null)
+                                })
                             },
                             dialogTitle = "Autorisations insuffisantes",
                             dialogText = "Veuillez activer la détection d'appareils à proximité dans les paramètres de l'application",
                             icon = Icons.Default.Info,
-                            confirmationText = "Autorisations"
+                            confirmationText = "Param. autorisations"
                         )
                     } else if (sendingNotification) {
                         notificationService.showBasicNotification(
@@ -150,67 +166,82 @@ class MainActivity : ComponentActivity() {
         }
 
         val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
-        if (hasSystemFeature) {
-
-            //Log nearby devices
-            val wifiAwareManager = getSystemService(Context.WIFI_AWARE_SERVICE) as WifiAwareManager
-            if(!wifiAwareManager.isAvailable){
-                wifiAwareDisabledDialogVisible = true
-            }
-            wifiAwareManager.attach(object : AttachCallback() {
-                override fun onAttached(session: WifiAwareSession) {
-                    super.onAttached(session)
-                    val publishConfig = PublishConfig.Builder()
-                        .setServiceName("com.helloyanis.streetmeet")
-                        .build()
-
-                    session.publish(publishConfig, object : DiscoverySessionCallback() {
-                        override fun onPublishStarted(session: PublishDiscoverySession) {
-                            super.onPublishStarted(session)
-                            println("Publish started")
-                            wifiAwarePublishStarted = true
-                        }
-
-                        override fun onServiceDiscovered(
-                            peerHandle: PeerHandle,
-                            serviceSpecificInfo: ByteArray?,
-                            matchFilter: List<ByteArray>?
-                        ) {
-                            super.onServiceDiscovered(peerHandle, serviceSpecificInfo, matchFilter)
-
-                            println("Service discovered from peer: $peerHandle")
-                        }
-
-                        override fun onMessageReceived(peerHandle: PeerHandle, message: ByteArray) {
-                            super.onMessageReceived(peerHandle, message)
-                            println("Message received from peer: $peerHandle : $message")
-                        }
-                    }, null)
-
-                    val subscribeConfig = SubscribeConfig.Builder()
-                        .setServiceName("com.helloyanis.streetmeet")
-                        .build()
-
-                    session.subscribe(subscribeConfig, object : DiscoverySessionCallback() {
-                        override fun onSubscribeStarted(session: SubscribeDiscoverySession) {
-                            super.onSubscribeStarted(session)
-                            println("Subscribe started")
-                            wifiAwareSubscribeStarted = true
-                        }
-
-                        override fun onServiceDiscovered(
-                            peerHandle: PeerHandle,
-                            serviceSpecificInfo: ByteArray?,
-                            matchFilter: List<ByteArray>?
-                        ) {
-                            super.onServiceDiscovered(peerHandle, serviceSpecificInfo, matchFilter)
-                            println("Service discovered from peer: $peerHandle")
-                        }
-                    }, null)
+        if (hasSystemFeature && checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
+                //Log nearby devices
+                val wifiAwareManager =
+                    getSystemService(Context.WIFI_AWARE_SERVICE) as WifiAwareManager
+                if (!wifiAwareManager.isAvailable) {
+                    wifiAwareDisabledDialogVisible = true
                 }
-            }, null)
+                wifiAwareManager.attach(object : AttachCallback() {
+                    override fun onAttached(session: WifiAwareSession) {
+                        super.onAttached(session)
+                        val publishConfig = PublishConfig.Builder()
+                            .setServiceName("com.helloyanis.streetmeet")
+                            .build()
+
+                        session.publish(publishConfig, object : DiscoverySessionCallback() {
+                            override fun onPublishStarted(session: PublishDiscoverySession) {
+                                super.onPublishStarted(session)
+                                println("Publish started")
+                                wifiAwarePublishStarted = true
+                            }
+
+                            override fun onServiceDiscovered(
+                                peerHandle: PeerHandle,
+                                serviceSpecificInfo: ByteArray?,
+                                matchFilter: List<ByteArray>?
+                            ) {
+                                super.onServiceDiscovered(
+                                    peerHandle,
+                                    serviceSpecificInfo,
+                                    matchFilter
+                                )
+
+                                println("Service discovered from peer: $peerHandle")
+                            }
+
+                            override fun onMessageReceived(
+                                peerHandle: PeerHandle,
+                                message: ByteArray
+                            ) {
+                                super.onMessageReceived(peerHandle, message)
+                                println("Message received from peer: $peerHandle : $message")
+                            }
+                        }, null)
+
+                        val subscribeConfig = SubscribeConfig.Builder()
+                            .setServiceName("com.helloyanis.streetmeet")
+                            .build()
+
+                        session.subscribe(subscribeConfig, object : DiscoverySessionCallback() {
+                            override fun onSubscribeStarted(session: SubscribeDiscoverySession) {
+                                super.onSubscribeStarted(session)
+                                println("Subscribe started")
+                                wifiAwareSubscribeStarted = true
+                            }
+
+                            override fun onServiceDiscovered(
+                                peerHandle: PeerHandle,
+                                serviceSpecificInfo: ByteArray?,
+                                matchFilter: List<ByteArray>?
+                            ) {
+                                super.onServiceDiscovered(
+                                    peerHandle,
+                                    serviceSpecificInfo,
+                                    matchFilter
+                                )
+                                println("Service discovered from peer: $peerHandle")
+                            }
+                        }, null)
+                    }
+                }, null)
         } else {
-            wifiAwareIncompatible = true
+            if(!hasSystemFeature) {
+                wifiAwareIncompatible = true
+            }else {
+                wifiAwareScanFailed = true
+            }
         }
     }
 }
