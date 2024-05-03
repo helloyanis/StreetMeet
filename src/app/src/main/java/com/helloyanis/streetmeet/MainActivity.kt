@@ -20,7 +20,9 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
@@ -51,6 +53,8 @@ class MainActivity : ComponentActivity() {
     private var wifiAwareDisabledDialogVisible by mutableStateOf(false)
     private var wifiAwareScanFailed by mutableStateOf(false)
     private var wifiAwareIncompatible by mutableStateOf(false)
+    private var wifiAwareSubscribeStarted by mutableStateOf(false)
+    private var wifiAwarePublishStarted by mutableStateOf(false)
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,6 +106,20 @@ class MainActivity : ComponentActivity() {
                             icon = Icons.Default.Info,
                             confirmationText = "Autorisations"
                         )
+                    }else{
+                        Column {
+                            if (wifiAwareSubscribeStarted) {
+                                Text("Recherche d'appareils à proximité...",
+                                    modifier = Modifier.padding(innerPadding)
+
+                                )
+                            }
+                            if (wifiAwarePublishStarted) {
+                                Text("Envoi de votre présence aux appareils à proximité..."
+                                    , modifier = Modifier.padding(innerPadding))
+                            }
+                        }
+
                     }
                 }
             }
@@ -126,6 +144,7 @@ class MainActivity : ComponentActivity() {
                         override fun onPublishStarted(session: PublishDiscoverySession) {
                             super.onPublishStarted(session)
                             println("Publish started")
+                            wifiAwarePublishStarted = true
                         }
 
                         override fun onServiceDiscovered(
@@ -135,6 +154,11 @@ class MainActivity : ComponentActivity() {
                         ) {
                             super.onServiceDiscovered(peerHandle, serviceSpecificInfo, matchFilter)
                             println("Service discovered from peer: $peerHandle")
+                        }
+
+                        override fun onMessageReceived(peerHandle: PeerHandle, message: ByteArray) {
+                            super.onMessageReceived(peerHandle, message)
+                            println("Message received from peer: $peerHandle : $message")
                         }
                     }, null)
 
@@ -146,6 +170,7 @@ class MainActivity : ComponentActivity() {
                         override fun onSubscribeStarted(session: SubscribeDiscoverySession) {
                             super.onSubscribeStarted(session)
                             println("Subscribe started")
+                            wifiAwareSubscribeStarted = true
                         }
 
                         override fun onServiceDiscovered(
@@ -165,28 +190,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    StreetMeetTheme {
-        Greeting("Android")
-    }
-    }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
