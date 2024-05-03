@@ -1,7 +1,6 @@
 package com.helloyanis.streetmeet
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,8 +17,10 @@ import android.net.wifi.aware.WifiAwareSession
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,23 +38,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 
 
-private lateinit var manager: WifiAwareManager
-var receiver: BroadcastReceiver? = null
-
-
-
-
 class MainActivity : ComponentActivity() {
-
     private var wifiAwareDisabledDialogVisible by mutableStateOf(false)
     private var wifiAwareScanFailed by mutableStateOf(false)
     private var wifiAwareIncompatible by mutableStateOf(false)
     private var wifiAwareSubscribeStarted by mutableStateOf(false)
     private var wifiAwarePublishStarted by mutableStateOf(false)
+    private var sendingNotification by mutableStateOf(false)
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,15 +56,42 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
+                val appPermission = arrayOf(
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                    android.Manifest.permission.NEARBY_WIFI_DEVICES
+                )
+
+                val appPermissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestMultiplePermissions(),
+                    onResult = { permissions ->
+                        val permissionsGranted =
+                            permissions.values.reduce { acc, isPermissionGranted ->
+                                acc && isPermissionGranted
+                            }
+
+                        if (!permissionsGranted) {
+                            wifiAwareScanFailed = true
+                        }
+                    }
+                )
+
+                appPermissionLauncher.launch(appPermission)
+                
+                val notificationService = NotificationService(this)
+                notificationService.createChannelNotification()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (wifiAwareIncompatible) {
                         AlertDialog(
                             onDismissRequest = { finishAndRemoveTask() },
                             onConfirmation = {
-                                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://developer.android.com/develop/connectivity/wifi/wifi-aware"))
+                                val browserIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://developer.android.com/develop/connectivity/wifi/wifi-aware")
+                                )
                                 startActivity(browserIntent)
                                 finishAndRemoveTask()
-                                             },
+                            },
                             dialogTitle = "Wi-Fi Aware incompatible",
                             dialogText = "Votre appareil n'est pas compatible avec cette fonctionnalité.",
                             icon = Icons.Default.Clear, // ou tout autre icône appropriée
@@ -86,7 +106,7 @@ class MainActivity : ComponentActivity() {
                                 )
                                 this.startActivity(intent)
                                 this.finishAffinity()
-                                               },
+                            },
                             onConfirmation = {
                                 startActivity(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY))
                             },
@@ -106,7 +126,11 @@ class MainActivity : ComponentActivity() {
                             icon = Icons.Default.Info,
                             confirmationText = "Autorisations"
                         )
-                    }else{
+                    } else if (sendingNotification) {
+                        notificationService.showBasicNotification(
+                            "Vous avez croisé quelqu'un",
+                            "Nathan est a proximité, envoie lui un message")
+                    } else {
                         Column {
                             if (wifiAwareSubscribeStarted) {
                                 Text("Recherche d'appareils à proximité...",
@@ -153,6 +177,7 @@ class MainActivity : ComponentActivity() {
                             matchFilter: List<ByteArray>?
                         ) {
                             super.onServiceDiscovered(peerHandle, serviceSpecificInfo, matchFilter)
+
                             println("Service discovered from peer: $peerHandle")
                         }
 
@@ -191,7 +216,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialog(
     onDismissRequest: () -> Unit,
