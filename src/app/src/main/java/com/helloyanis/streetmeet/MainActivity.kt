@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.wifi.aware.AttachCallback
+import android.net.wifi.aware.DiscoverySession
 import android.net.wifi.aware.DiscoverySessionCallback
 import android.net.wifi.aware.PeerHandle
 import android.net.wifi.aware.PublishConfig
@@ -16,6 +17,7 @@ import android.net.wifi.aware.WifiAwareManager
 import android.net.wifi.aware.WifiAwareSession
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -49,6 +51,9 @@ class MainActivity : ComponentActivity() {
     private var wifiAwareSubscribeStarted by mutableStateOf(false)
     private var wifiAwarePublishStarted by mutableStateOf(false)
     private var sendingNotification by mutableStateOf(false)
+    private var discoverySession: DiscoverySession? = null
+    private var showMessagePopup by mutableStateOf(false)
+    private var messageText by mutableStateOf("")
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,6 +163,18 @@ class MainActivity : ComponentActivity() {
                                 Text("Envoi de votre présence aux appareils à proximité..."
                                     , modifier = Modifier.padding(innerPadding))
                             }
+                            if (showMessagePopup) {
+                                AlertDialog(
+                                    onDismissRequest = { showMessagePopup = false },
+                                    onConfirmation = {
+                                        showMessagePopup = false
+                                    },
+                                    dialogTitle = "Message reçu",
+                                    dialogText = messageText,
+                                    icon = Icons.Default.Info,
+                                    confirmationText = "OK"
+                                )
+                            }
                         }
 
                     }
@@ -181,10 +198,13 @@ class MainActivity : ComponentActivity() {
                             .build()
 
                         session.publish(publishConfig, object : DiscoverySessionCallback() {
+
+
                             override fun onPublishStarted(session: PublishDiscoverySession) {
                                 super.onPublishStarted(session)
                                 println("Publish started")
                                 wifiAwarePublishStarted = true
+                                discoverySession = session
                             }
 
                             override fun onServiceDiscovered(
@@ -197,8 +217,20 @@ class MainActivity : ComponentActivity() {
                                     serviceSpecificInfo,
                                     matchFilter
                                 )
+                                println("1 Service discovered from peer: $peerHandle")
+                                Toast.makeText(
+                                    applicationContext,
+                                    "1",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                // Envoyer le message en utilisant la variable de membre discoverySession
+                                discoverySession?.sendMessage(
+                                    peerHandle,
+                                    0,
+                                    "Hello".toByteArray()
+                                )
+                                println("1Message sent to peer: $peerHandle")
 
-                                println("Service discovered from peer: $peerHandle")
                             }
 
                             override fun onMessageReceived(
@@ -206,7 +238,10 @@ class MainActivity : ComponentActivity() {
                                 message: ByteArray
                             ) {
                                 super.onMessageReceived(peerHandle, message)
-                                println("Message received from peer: $peerHandle : $message")
+
+                                println("1Message received from peer: $peerHandle : ${String(message)}")
+                                messageText = String(message)
+                                showMessagePopup = true
                             }
                         }, null)
 
@@ -219,6 +254,7 @@ class MainActivity : ComponentActivity() {
                                 super.onSubscribeStarted(session)
                                 println("Subscribe started")
                                 wifiAwareSubscribeStarted = true
+                                discoverySession = session
                             }
 
                             override fun onServiceDiscovered(
@@ -232,9 +268,35 @@ class MainActivity : ComponentActivity() {
                                     matchFilter
                                 )
                                 println("Service discovered from peer: $peerHandle")
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Service discovered",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                val message = "Hi there"
+                                discoverySession?.sendMessage(
+                                    peerHandle,
+                                    0,
+                                    message.toByteArray()
+                                )
+                                println("Message sent to peer: $peerHandle : ${message}")
+                            }
+                            override fun onMessageReceived(
+                                peerHandle: PeerHandle,
+                                message: ByteArray
+                            ) {
+                                super.onMessageReceived(peerHandle, message)
+
+                                println("Message received from peer: $peerHandle : ${String(message)}")
+                                Toast.makeText(
+                                    applicationContext,
+                                    String(message),
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }, null)
-                    }
+
+                        }
                 }, null)
         } else {
             if(!hasSystemFeature) {
