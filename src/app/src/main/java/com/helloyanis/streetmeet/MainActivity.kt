@@ -28,14 +28,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -48,10 +48,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 
@@ -301,7 +300,7 @@ class MainActivity : ComponentActivity() {
                                     0,
                                     message.toByteArray()
                                 )
-                                println("Message sent to peer: $peerHandle : ${message}")
+                                println("Message sent to peer: $peerHandle : $message")
                             }
                             override fun onMessageReceived(
                                 peerHandle: PeerHandle,
@@ -331,7 +330,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier, context: Context, unit: Unit) {
+fun Greeting(modifier: Modifier = Modifier, context: Context, unit: Unit) {
     var checked by remember {
         mutableStateOf(false)
     }
