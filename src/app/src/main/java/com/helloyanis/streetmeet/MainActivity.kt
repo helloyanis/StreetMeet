@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity() {
                     } else if (sendingNotification) {
                         notificationService.showBasicNotification(
                             "Vous avez croisé quelqu'un",
-                            "Nathan est a proximité, envoie lui un message")
+                            "Quelqu'un est a proximité, votre message personnalisé à été envoyé")
                     } else {
                         Column {
                             if (wifiAwareSubscribeStarted) {
@@ -273,13 +273,14 @@ class MainActivity : ComponentActivity() {
                                     "Service discovered",
                                     Toast.LENGTH_LONG
                                 ).show()
+                                sendingNotification = true
                                 val message = "Hi there"
                                 discoverySession?.sendMessage(
                                     peerHandle,
                                     0,
                                     message.toByteArray()
                                 )
-                                println("Message sent to peer: $peerHandle : ${message}")
+                                println("Message sent to peer: $peerHandle : $message")
                             }
                             override fun onMessageReceived(
                                 peerHandle: PeerHandle,
