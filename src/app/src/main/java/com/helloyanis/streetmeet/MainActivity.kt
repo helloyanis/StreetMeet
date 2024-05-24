@@ -36,11 +36,10 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -69,7 +68,7 @@ class MainActivity : ComponentActivity() {
                     Greeting(
                         name = "Android",
                         modifier = Modifier.padding(innerPadding),
-                        this
+                        this,
                 if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     val appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
@@ -102,9 +101,12 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(Unit) {
                         appPermissionLauncher.launch(appPermission)
                     }
+                } else {
+
+                })
                 }
-                
-                val notificationService = NotificationService(this)
+
+                        val notificationService = NotificationService(this)
                 notificationService.createChannelNotification()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -320,7 +322,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier, context: Context) {
+fun Greeting(name: String, modifier: Modifier = Modifier, context: Context, unit: Unit) {
     var checked by remember {
         mutableStateOf(false)
     }
