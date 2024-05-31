@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import kotlin.random.Random
+
 class NotificationService(
     private val context: Context,
     private val notificationManager: NotificationManager
@@ -20,7 +21,7 @@ class NotificationService(
         println("[INFO] Channel created")
     }
 
-    fun send(title: String, content: String): Notification {
+    fun send(title: String, content: String): Pair<Int, Notification> {
         val notification = NotificationCompat.Builder(context, "alertMeet")
             .setContentTitle(title)
             .setContentText(content)
@@ -34,6 +35,8 @@ class NotificationService(
             notification
         )
 
-        return notification
+        val notificationId = Random.nextInt()
+        notificationManager.notify(notificationId, notification)
+        return Pair(notificationId, notification)
     }
 }

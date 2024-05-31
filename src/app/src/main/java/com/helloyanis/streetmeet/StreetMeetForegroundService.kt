@@ -1,8 +1,7 @@
 package com.helloyanis.streetmeet
 
-import android.app.Notification
+import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 
@@ -11,12 +10,15 @@ class StreetMeetForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationService = NotificationService(this)
+        notificationService = NotificationService(
+            this,
+            this.getSystemService(NotificationManager::class.java)
+        )
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         notificationService.createChannelNotification()
-        val notification = notificationService.showBasicNotification("StreetMeet", "StreetMeet is running")
+        val notification = notificationService.send("StreetMeet", "StreetMeet is running")
         startForeground(notification.first, notification.second)
         return START_STICKY
     }
