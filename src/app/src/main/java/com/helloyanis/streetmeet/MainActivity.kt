@@ -23,24 +23,37 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 
 
@@ -62,6 +75,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
+                MainUI()
+
                 if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     val appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
@@ -95,7 +110,7 @@ class MainActivity : ComponentActivity() {
                         appPermissionLauncher.launch(appPermission)
                     }
                 }
-                
+
                 val notificationService = NotificationService(this)
                 notificationService.createChannelNotification()
 
@@ -306,6 +321,64 @@ class MainActivity : ComponentActivity() {
                 wifiAwareScanFailed = true
             }
         }
+    }
+}
+
+@Composable
+@Preview
+fun MainUI() {
+    var checked by remember {
+        mutableStateOf(false)
+    }
+    var customMessage by remember {
+        //mutableStateOf(sharedPreferencesTalker.getMessageFromSharedPreferences())
+        mutableStateOf("place")
+    }
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Hello",
+        )
+        Spacer(modifier = Modifier.weight(0.7f))
+
+        Button(
+            onClick = {
+                if (checked) {
+                    //context.startService(Intent(context, BackgroundService::class.java))
+                    checked = true
+
+                } else {
+                    //context.stopService(Intent(context, BackgroundService::class.java))
+                    checked = false
+                }
+            }, modifier = Modifier.size(200.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor =
+                if (checked) Color.Blue
+                else Color(0xFF696A8A)
+            )
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_connect),
+                contentDescription = "connect icon",
+                modifier = Modifier.size(150.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(0.3f))
+        TextField(value = customMessage, onValueChange = {
+            customMessage = it
+        })
+        Button(onClick = { /*sharedPreferencesTalker.setMessageInSharedPreferences(customMessage)*/ }
+            , modifier = Modifier.padding(bottom = 40.dp, top = 10.dp)) {
+            Text(text = "Valid Change")
+        }
+        //sharedPreferencesTalker.setMessageInSharedPreferences(customMessage)
+
+
     }
 }
 
