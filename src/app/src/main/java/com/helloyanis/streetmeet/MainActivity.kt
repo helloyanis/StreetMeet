@@ -1,6 +1,7 @@
 package com.helloyanis.streetmeet
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,6 +16,7 @@ import android.net.wifi.aware.SubscribeConfig
 import android.net.wifi.aware.SubscribeDiscoverySession
 import android.net.wifi.aware.WifiAwareManager
 import android.net.wifi.aware.WifiAwareSession
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -26,12 +28,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,6 +47,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 
 
@@ -54,6 +62,7 @@ class MainActivity : ComponentActivity() {
     private var discoverySession: DiscoverySession? = null
     private var showMessagePopup by mutableStateOf(false)
     private var messageText by mutableStateOf("")
+    private var backgroundUse by mutableStateOf(false)
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +72,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             StreetMeetTheme {
                 if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                    val appPermission = arrayOf(
+                    var appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
                         android.Manifest.permission.NEARBY_WIFI_DEVICES
                     )
@@ -85,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                 this.startActivity(intent)
                                 this.finishAffinity()
                             } else {
-                                wifiAwareScanFailed = true
+                               wifiAwareScanFailed = true
 
                             }
                         }
@@ -96,7 +105,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 
-                val notificationService = NotificationService(this)
+                val notificationService = NotificationService(applicationContext)
                 notificationService.createChannelNotification()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -163,6 +172,33 @@ class MainActivity : ComponentActivity() {
                                 Text("Envoi de votre présence aux appareils à proximité..."
                                     , modifier = Modifier.padding(innerPadding))
                             }
+                            Switch(
+                                checked = backgroundUse,
+                                onCheckedChange = {
+                                    backgroundUse = it
+                                    val context = applicationContext
+                                    if (backgroundUse) {
+                                        val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
+                                        context.startForegroundService(serviceIntent)
+                                    } else {
+                                        val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
+                                        context.stopService(serviceIntent)
+                                    }
+                                },
+                                modifier = Modifier.size(50.dp),
+                                thumbContent = if (backgroundUse) {
+                                    {
+                                        Icon(
+                                            imageVector = Icons.Filled.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                                        )
+                                    }
+                                } else {
+                                    null
+                                }
+                            )
+
                             if (showMessagePopup) {
                                 AlertDialog(
                                     onDismissRequest = { showMessagePopup = false },
