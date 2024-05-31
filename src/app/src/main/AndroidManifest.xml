@@ -13,6 +13,10 @@
         android:maxSdkVersion="32" />
     <uses-permission
         android:required="true"
+        android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:required="true"
         android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission
         android:required="true"
@@ -22,6 +26,11 @@
         android:name="android.permission.INTERNET"/>
     <uses-permission
         android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING"/>
+    <uses-permission
+        android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -32,6 +41,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StreetMeet"
         tools:targetApi="31">
+        <service
+            android:name=".StreetMeetForegroundService"
+            android:foregroundServiceType="remoteMessaging"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
