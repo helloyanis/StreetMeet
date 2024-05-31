@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
-                MainUI()
+
 
                 if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     val appPermission = arrayOf(
@@ -171,10 +171,7 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Column {
                             if (wifiAwareSubscribeStarted) {
-                                Text("Recherche d'appareils à proximité...",
-                                    modifier = Modifier.padding(innerPadding)
-
-                                )
+                                Text("Recherche d'appareils à proximité...")
                             }
                             if (wifiAwarePublishStarted) {
                                 Text("Envoi de votre présence aux appareils à proximité..."
@@ -192,6 +189,7 @@ class MainActivity : ComponentActivity() {
                                     confirmationText = "OK"
                                 )
                             }
+                            MainUI()
                         }
 
                     }
