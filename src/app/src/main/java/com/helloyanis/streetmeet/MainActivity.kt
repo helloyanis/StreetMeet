@@ -1,6 +1,7 @@
 package com.helloyanis.streetmeet
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -96,7 +97,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 
-                val notificationService = NotificationService(this)
+                val notificationService = NotificationService(
+                    this,
+                    this.getSystemService(NotificationManager::class.java)
+                )
                 notificationService.createChannelNotification()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -148,9 +152,10 @@ class MainActivity : ComponentActivity() {
                             confirmationText = "Param. autorisations"
                         )
                     } else if (sendingNotification) {
-                        notificationService.showBasicNotification(
-                            "Vous avez croisé quelqu'un",
-                            "Quelqu'un est a proximité, votre message personnalisé à été envoyé")
+                        notificationService.send(
+                            title = "Vous avez croisé quelqu'un",
+                            content = "Quelqu'un est a proximité, votre message personnalisé à été envoyé"
+                        )
                     } else {
                         Column {
                             if (wifiAwareSubscribeStarted) {
