@@ -25,7 +25,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -161,7 +164,7 @@ class MainActivity : ComponentActivity() {
                             "Vous avez croisé quelqu'un",
                             "Quelqu'un est a proximité, votre message personnalisé à été envoyé")
                     } else {
-                        Column {
+                        Column(modifier = Modifier.padding(innerPadding)) {
                             if (wifiAwareSubscribeStarted) {
                                 Text("Recherche d'appareils à proximité...",
                                     modifier = Modifier.padding(innerPadding)
@@ -172,32 +175,37 @@ class MainActivity : ComponentActivity() {
                                 Text("Envoi de votre présence aux appareils à proximité..."
                                     , modifier = Modifier.padding(innerPadding))
                             }
-                            Switch(
-                                checked = backgroundUse,
-                                onCheckedChange = {
-                                    backgroundUse = it
-                                    val context = applicationContext
-                                    if (backgroundUse) {
-                                        val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
-                                        context.startForegroundService(serviceIntent)
+                            Row(modifier = Modifier.padding(innerPadding), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text("Utiliser StreetMeet en arrière-plan",
+                                    modifier = Modifier.padding(innerPadding))
+                                Switch(
+                                    checked = backgroundUse,
+                                    onCheckedChange = {
+                                        backgroundUse = it
+                                        val context = applicationContext
+                                        if (backgroundUse) {
+                                            val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
+                                            context.startForegroundService(serviceIntent)
+                                        } else {
+                                            val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
+                                            context.stopService(serviceIntent)
+                                        }
+                                    },
+                                    modifier = Modifier.size(50.dp),
+                                    thumbContent = if (backgroundUse) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Check,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(SwitchDefaults.IconSize),
+                                            )
+                                        }
                                     } else {
-                                        val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
-                                        context.stopService(serviceIntent)
+                                        null
                                     }
-                                },
-                                modifier = Modifier.size(50.dp),
-                                thumbContent = if (backgroundUse) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Filled.Check,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(SwitchDefaults.IconSize),
-                                        )
-                                    }
-                                } else {
-                                    null
-                                }
-                            )
+                                )
+                            }
+
 
                             if (showMessagePopup) {
                                 AlertDialog(
