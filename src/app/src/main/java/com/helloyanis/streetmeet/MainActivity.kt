@@ -26,6 +26,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -54,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 
 
@@ -341,10 +343,12 @@ fun MainUI() {
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.fillMaxHeight(0.05f))
         Text(
-            text = "Hello",
+            text = "StreetMeet",
+            fontSize = 50.sp
         )
-        Spacer(modifier = Modifier.weight(0.7f))
+        Spacer(modifier = Modifier.weight(0.3f))
 
         Button(
             onClick = {
@@ -369,11 +373,13 @@ fun MainUI() {
                 modifier = Modifier.size(150.dp)
             )
         }
+        Text(text = if(checked) "push to stop" else "push to start")
 
         Spacer(modifier = Modifier.weight(0.3f))
+        Text(text = "personalize your message:")
         TextField(value = customMessage, onValueChange = {
             customMessage = it
-        })
+        }, modifier = Modifier.padding(top = 5.dp))
         Button(onClick = { sharedPreferencesTalker.setMessageInSharedPreferences(customMessage) }
             , modifier = Modifier.padding(bottom = 40.dp, top = 10.dp)) {
             Text(text = "Valid Change")
