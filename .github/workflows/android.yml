@@ -22,14 +22,6 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Cache Gradle build
-      uses: actions/cache@v2
-      with:
-        path: ~/.gradle/build
-        key: ${{ runner.os }}-gradle-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-build-
-
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
       with:
@@ -38,9 +30,6 @@ jobs:
         arch: x86_64
         profile: no
         ndk: no
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
       
     - name: Build with Gradle
       run: ./gradlew build
