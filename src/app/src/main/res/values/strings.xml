@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">StreetMeet</string>
+    <string name="sharedPreferencesMessageFileName">StreetMeet_message</string>
 </resources>

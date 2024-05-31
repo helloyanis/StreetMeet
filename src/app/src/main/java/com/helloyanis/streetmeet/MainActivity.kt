@@ -327,14 +327,16 @@ class MainActivity : ComponentActivity() {
 @Composable
 @Preview
 fun MainUI() {
+    val context = LocalContext.current
+    val sharedPreferencesTalker = SharedPreferencesTalker(context)
     var checked by remember {
         mutableStateOf(false)
     }
     var customMessage by remember {
-        //mutableStateOf(sharedPreferencesTalker.getMessageFromSharedPreferences())
+        mutableStateOf(sharedPreferencesTalker.getMessageFromSharedPreferences())
         mutableStateOf("place")
     }
-    val context = LocalContext.current
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -372,7 +374,7 @@ fun MainUI() {
         TextField(value = customMessage, onValueChange = {
             customMessage = it
         })
-        Button(onClick = { /*sharedPreferencesTalker.setMessageInSharedPreferences(customMessage)*/ }
+        Button(onClick = { sharedPreferencesTalker.setMessageInSharedPreferences(customMessage) }
             , modifier = Modifier.padding(bottom = 40.dp, top = 10.dp)) {
             Text(text = "Valid Change")
         }
