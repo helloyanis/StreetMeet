@@ -56,7 +56,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
+import com.helloyanis.streetmeet.view.MainScreen
+import com.helloyanis.streetmeet.view.MessageListScreen
+import com.helloyanis.streetmeet.view.SettingScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -79,7 +85,7 @@ class MainActivity : ComponentActivity() {
             StreetMeetTheme {
 
 
-                if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                /*if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     val appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
                         android.Manifest.permission.NEARBY_WIFI_DEVICES
@@ -189,15 +195,16 @@ class MainActivity : ComponentActivity() {
                                     confirmationText = "OK"
                                 )
                             }
-                            MainUI()
-                        }
+                            //MainUI()*/
+                            RootNavHost()
+                        //}
 
                     }
                 }
             }
         }
 
-        val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
+       /* val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
         if (hasSystemFeature && checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
                 //Log nearby devices
                 val wifiAwareManager =
@@ -320,6 +327,26 @@ class MainActivity : ComponentActivity() {
             }else {
                 wifiAwareScanFailed = true
             }
+        }
+    }
+}*/
+
+@Composable
+fun RootNavHost(){
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "MainScreen"
+    ){
+        composable("mainScreen")
+        {
+            MainScreen(navController)
+        }
+        composable("messageList")
+        {
+            MessageListScreen(navController = navController)
+        }
+        composable("setting")
+        {
+            SettingScreen(navController = navController)
         }
     }
 }
