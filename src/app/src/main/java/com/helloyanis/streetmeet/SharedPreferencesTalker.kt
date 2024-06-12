@@ -3,14 +3,11 @@ package com.helloyanis.streetmeet
 import android.content.Context
 import android.widget.Toast
 
-class SharedPreferencesTalker(val context: Context) {
+class SharedPreferencesTalker(private val context: Context) {
     fun getMessageFromSharedPreferences(): String{
         val sharedPreferences = context.getSharedPreferences(
             context.getString(R.string.sharedPreferencesMessageFileName), Context.MODE_PRIVATE
         )
-        sharedPreferences.getString("savedMessage","Hello there") ?: {
-            Toast.makeText(context, "no sharedPreferences" , Toast.LENGTH_SHORT).show()
-        }
 
         return sharedPreferences.getString("savedMessage","Hello there") ?: "Hello there"
     }
@@ -25,5 +22,25 @@ class SharedPreferencesTalker(val context: Context) {
         }
 
         Toast.makeText(context, "new Message saved" , Toast.LENGTH_SHORT).show()
+    }
+
+    fun getNameFromSharedPreferences(): String{
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.sharedPreferencesMessageFileName), Context.MODE_PRIVATE
+        )
+
+        return sharedPreferences.getString("savedName","Sans") ?: "Hello Sans"
+    }
+
+    fun setNameInSharedPreferences( newMessage: String){
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.sharedPreferencesMessageFileName), Context.MODE_PRIVATE
+        )
+        with(sharedPreferences.edit()){
+            putString("savedName",newMessage)
+            apply()
+        }
+
+        Toast.makeText(context, "new name saved" , Toast.LENGTH_SHORT).show()
     }
 }

@@ -346,7 +346,7 @@ fun RootNavHost(){
         }
         composable("setting")
         {
-            SettingScreen(navController = navController)
+            SettingScreen(navController = navController, LocalContext.current)
         }
     }
 }
