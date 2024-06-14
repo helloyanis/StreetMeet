@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,6 +29,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,6 +51,9 @@ fun SettingScreen(navController: NavController, context: Context) {
     }
     var message by remember {
         mutableStateOf(SharedPreferencesTalker(context).getMessageFromSharedPreferences())
+    }
+    var activationTime by remember {
+        mutableStateOf("")
     }
 
 
@@ -93,10 +99,24 @@ fun SettingScreen(navController: NavController, context: Context) {
             )
             Switch(checked = backgroundCheck, onCheckedChange = { backgroundCheck = it })
         }
-
-        Button(onClick = { /*TODO*/ }, Modifier.padding(top = 10.dp)) {
-            Text(text = stringResource(id = R.string.activationTimeSetting))
-        }
+        
+        OutlinedTextField(
+            value = activationTime,
+            onValueChange = { value ->
+                if (value.length <= 3) activationTime = value.filter { it.isDigit() }
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+            label = {
+                Text(text = stringResource(id = R.string.activationTimeSetting))
+            },
+            suffix = {
+                Text(text = "minutes")
+            },
+            supportingText = {
+                Text(text = "0 means constantly activate")
+            }
+        )
         Spacer(modifier = Modifier.fillMaxHeight(0.4f))
 
         Button(
