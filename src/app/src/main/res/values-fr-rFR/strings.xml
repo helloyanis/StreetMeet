@@ -2,12 +2,12 @@
 <resources>
     <string name="app_name">StreetMeet</string>
     <string name="messageListButton">Liste des messages reçus</string>
-    <string name="nearbyDevice">Appareil à proximité</string>
+    <string name="nearbyDevice">Appareil(s) à proximité</string>
     <string name="searchingText">Recherche en cours...</string>
     <string name="settingTitle">Paramètre</string>
     <string name="backgroundAppText">Activer l\'app en arrière plan</string>
-    <string name="nameSetting">changer votre nom</string>
-    <string name="messageSetting">changer votre message à envoyer</string>
-    <string name="backToMain">Retournez à l\'écran principale</string>
+    <string name="nameSetting">Changer votre nom</string>
+    <string name="messageSetting">Changer votre message à envoyer</string>
+    <string name="backToMain">Retournez à l\'écran principal</string>
     <string name="activationTimeSetting">Tapez la durée d\'activation</string>
 </resources>

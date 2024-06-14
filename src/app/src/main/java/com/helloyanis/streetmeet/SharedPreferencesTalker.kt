@@ -20,8 +20,6 @@ class SharedPreferencesTalker(private val context: Context) {
             putString("savedMessage",newMessage)
             apply()
         }
-
-        Toast.makeText(context, "new Message saved" , Toast.LENGTH_SHORT).show()
     }
 
     fun getNameFromSharedPreferences(): String{
@@ -29,7 +27,7 @@ class SharedPreferencesTalker(private val context: Context) {
             context.getString(R.string.sharedPreferencesMessageFileName), Context.MODE_PRIVATE
         )
 
-        return sharedPreferences.getString("savedName","Sans") ?: "Hello Sans"
+        return sharedPreferences.getString("savedName","Anonyme") ?: "Hello!"
     }
 
     fun setNameInSharedPreferences( newMessage: String){
@@ -40,7 +38,5 @@ class SharedPreferencesTalker(private val context: Context) {
             putString("savedName",newMessage)
             apply()
         }
-
-        Toast.makeText(context, "new name saved" , Toast.LENGTH_SHORT).show()
     }
 }

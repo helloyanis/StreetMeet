@@ -2,10 +2,10 @@
     <string name="app_name">StreetMeet</string>
     <string name="sharedPreferencesMessageFileName" translatable="false">StreetMeet_message</string>
     <string name="messageListButton">List of received message</string>
-    <string name="nearbyDevice">nearby device</string>
+    <string name="nearbyDevice">Nearby device(s)</string>
     <string name="searchingText">Searching...</string>
     <string name="settingTitle">Settings</string>
-    <string name="backgroundAppText">Activate the app in background</string>
+    <string name="backgroundAppText">Enable in background</string>
     <string name="nameSetting">Change your name</string>
     <string name="messageSetting">Change your message to send</string>
     <string name="backToMain">Return to the main screen</string>

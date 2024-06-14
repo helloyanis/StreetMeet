@@ -64,17 +64,17 @@ import com.helloyanis.streetmeet.view.MainScreen
 import com.helloyanis.streetmeet.view.MessageListScreen
 import com.helloyanis.streetmeet.view.SettingScreen
 
-
+private var wifiAwareDisabledDialogVisible by mutableStateOf(false)
+private var wifiAwareScanFailed by mutableStateOf(false)
+private var wifiAwareIncompatible by mutableStateOf(false)
+var wifiAwareSubscribeStarted by mutableStateOf(false)
+var wifiAwarePublishStarted by mutableStateOf(false)
+private var sendingNotification by mutableStateOf(false)
+private var discoverySession: DiscoverySession? = null
+private var showMessagePopup by mutableStateOf(false)
+private var messageText by mutableStateOf("")
+var nearbyDevicesAmount by mutableStateOf(0)
 class MainActivity : ComponentActivity() {
-    private var wifiAwareDisabledDialogVisible by mutableStateOf(false)
-    private var wifiAwareScanFailed by mutableStateOf(false)
-    private var wifiAwareIncompatible by mutableStateOf(false)
-    private var wifiAwareSubscribeStarted by mutableStateOf(false)
-    private var wifiAwarePublishStarted by mutableStateOf(false)
-    private var sendingNotification by mutableStateOf(false)
-    private var discoverySession: DiscoverySession? = null
-    private var showMessagePopup by mutableStateOf(false)
-    private var messageText by mutableStateOf("")
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,9 +83,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
+                RootNavHost()
 
-
-                /*if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     val appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
                         android.Manifest.permission.NEARBY_WIFI_DEVICES
@@ -175,14 +175,6 @@ class MainActivity : ComponentActivity() {
                             "Vous avez croisé quelqu'un",
                             "Quelqu'un est a proximité, votre message personnalisé à été envoyé")
                     } else {
-                        Column {
-                            if (wifiAwareSubscribeStarted) {
-                                Text("Recherche d'appareils à proximité...")
-                            }
-                            if (wifiAwarePublishStarted) {
-                                Text("Envoi de votre présence aux appareils à proximité..."
-                                    , modifier = Modifier.padding(innerPadding))
-                            }
                             if (showMessagePopup) {
                                 AlertDialog(
                                     onDismissRequest = { showMessagePopup = false },
@@ -195,16 +187,15 @@ class MainActivity : ComponentActivity() {
                                     confirmationText = "OK"
                                 )
                             }
-                            //MainUI()*/
                             RootNavHost()
-                        //}
+
 
                     }
                 }
             }
         }
 
-       /* val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
+       val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
         if (hasSystemFeature && checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
                 //Log nearby devices
                 val wifiAwareManager =
@@ -239,6 +230,7 @@ class MainActivity : ComponentActivity() {
                                     serviceSpecificInfo,
                                     matchFilter
                                 )
+                                nearbyDevicesAmount++
                                 println("1 Service discovered from peer: $peerHandle")
                                 Toast.makeText(
                                     applicationContext,
@@ -254,7 +246,10 @@ class MainActivity : ComponentActivity() {
                                 println("1Message sent to peer: $peerHandle")
 
                             }
-
+                            override fun onServiceLost(peerHandle: PeerHandle, reason: Int) {
+                                nearbyDevicesAmount--
+                                super.onServiceLost(peerHandle, reason)
+                            }
                             override fun onMessageReceived(
                                 peerHandle: PeerHandle,
                                 message: ByteArray
@@ -289,6 +284,7 @@ class MainActivity : ComponentActivity() {
                                     serviceSpecificInfo,
                                     matchFilter
                                 )
+                                nearbyDevicesAmount++
                                 println("Service discovered from peer: $peerHandle")
                                 Toast.makeText(
                                     applicationContext,
@@ -303,6 +299,11 @@ class MainActivity : ComponentActivity() {
                                     message.toByteArray()
                                 )
                                 println("Message sent to peer: $peerHandle : $message")
+                            }
+
+                            override fun onServiceLost(peerHandle: PeerHandle, reason: Int) {
+                                nearbyDevicesAmount--
+                                super.onServiceLost(peerHandle, reason)
                             }
                             override fun onMessageReceived(
                                 peerHandle: PeerHandle,
@@ -329,7 +330,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}*/
+}
 
 @Composable
 fun RootNavHost(){
@@ -338,7 +339,7 @@ fun RootNavHost(){
     ){
         composable("mainScreen")
         {
-            MainScreen(navController)
+            MainScreen(navController, wifiAwareSubscribeStarted, wifiAwarePublishStarted, nearbyDevicesAmount)
         }
         composable("messageList")
         {
@@ -348,70 +349,6 @@ fun RootNavHost(){
         {
             SettingScreen(navController = navController, LocalContext.current)
         }
-    }
-}
-
-@Composable
-@Preview
-fun MainUI() {
-    val context = LocalContext.current
-    val sharedPreferencesTalker = SharedPreferencesTalker(context)
-    var checked by remember {
-        mutableStateOf(false)
-    }
-    var customMessage by remember {
-        mutableStateOf(sharedPreferencesTalker.getMessageFromSharedPreferences())
-        mutableStateOf("place")
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.fillMaxHeight(0.05f))
-        Text(
-            text = "StreetMeet",
-            fontSize = 50.sp
-        )
-        Spacer(modifier = Modifier.weight(0.3f))
-
-        Button(
-            onClick = {
-                if (checked) {
-                    //context.startService(Intent(context, BackgroundService::class.java))
-                    checked = true
-
-                } else {
-                    //context.stopService(Intent(context, BackgroundService::class.java))
-                    checked = false
-                }
-            }, modifier = Modifier.size(200.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor =
-                if (checked) Color.Blue
-                else Color(0xFF696A8A)
-            )
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_connect),
-                contentDescription = "connect icon",
-                modifier = Modifier.size(150.dp)
-            )
-        }
-        Text(text = if(checked) "push to stop" else "push to start")
-
-        Spacer(modifier = Modifier.weight(0.3f))
-        Text(text = "personalize your message:")
-        TextField(value = customMessage, onValueChange = {
-            customMessage = it
-        }, modifier = Modifier.padding(top = 5.dp))
-        Button(onClick = { sharedPreferencesTalker.setMessageInSharedPreferences(customMessage) }
-            , modifier = Modifier.padding(bottom = 40.dp, top = 10.dp)) {
-            Text(text = "Valid Change")
-        }
-        //sharedPreferencesTalker.setMessageInSharedPreferences(customMessage)
-
-
     }
 }
 
