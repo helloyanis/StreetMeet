@@ -1,6 +1,7 @@
 package com.helloyanis.streetmeet.view
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -29,7 +33,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,11 +40,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.R
 import com.helloyanis.streetmeet.SharedPreferencesTalker
+import com.helloyanis.streetmeet.StreetMeetForegroundService
 
 @Composable
-fun SettingScreen(navController: NavController, context: Context) {
+fun SettingScreen(navController: NavController, context: Context, backgroundUse: Boolean) {
     var backgroundCheck by remember {
-        mutableStateOf(false)
+        mutableStateOf(backgroundUse)
     }
     var showDialogWithReason by remember {
         mutableStateOf("none")
@@ -51,9 +55,6 @@ fun SettingScreen(navController: NavController, context: Context) {
     }
     var message by remember {
         mutableStateOf(SharedPreferencesTalker(context).getMessageFromSharedPreferences())
-    }
-    var activationTime by remember {
-        mutableStateOf("")
     }
 
 
@@ -97,26 +98,34 @@ fun SettingScreen(navController: NavController, context: Context) {
                 Modifier.padding(end = 10.dp),
                 fontSize = 20.sp
             )
-            Switch(checked = backgroundCheck, onCheckedChange = { backgroundCheck = it })
+            val appContext = LocalContext.current
+            Switch(checked = backgroundCheck, onCheckedChange = {
+                backgroundCheck = it
+                if (backgroundCheck) {
+                    val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
+                    appContext.startForegroundService(serviceIntent)
+                } else {
+                    val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
+                    appContext.stopService(serviceIntent)
+                }
+            }, Modifier.padding(start = 10.dp),
+                thumbContent = if (backgroundCheck) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize),
+                        )
+                    }
+                } else {
+                    null
+                })
         }
-        
-        OutlinedTextField(
-            value = activationTime,
-            onValueChange = { value ->
-                if (value.length <= 3) activationTime = value.filter { it.isDigit() }
-            },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            label = {
-                Text(text = stringResource(id = R.string.activationTimeSetting))
-            },
-            suffix = {
-                Text(text = "minutes")
-            },
-            supportingText = {
-                Text(text = "0 means constantly activate")
-            }
-        )
+
+
+        Button(onClick = { /*TODO*/ }, Modifier.padding(top = 10.dp)) {
+            Text(text = stringResource(id = R.string.activationTimeSetting))
+        }
         Spacer(modifier = Modifier.fillMaxHeight(0.4f))
 
         Button(
@@ -188,5 +197,5 @@ fun SettingScreen(navController: NavController, context: Context) {
 @Preview
 @Composable
 fun SettingPreview() {
-    SettingScreen(rememberNavController(), LocalContext.current)
+    SettingScreen(rememberNavController(), LocalContext.current, true)
 }

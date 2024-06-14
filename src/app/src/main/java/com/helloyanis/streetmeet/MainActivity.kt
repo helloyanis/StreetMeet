@@ -1,6 +1,7 @@
 package com.helloyanis.streetmeet
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -58,6 +59,7 @@ private var discoverySession: DiscoverySession? = null
 private var showMessagePopup by mutableStateOf(false)
 private var messageText by mutableStateOf("")
 var nearbyDevicesAmount by mutableStateOf(0)
+private var backgroundUse by mutableStateOf(false)
 class MainActivity : ComponentActivity() {
 
     @SuppressLint("MissingPermission")
@@ -103,7 +105,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val notificationService = NotificationService(this)
+                val notificationService = NotificationService(this, getSystemService(
+                    NotificationManager::class.java)!!)
                 notificationService.createChannelNotification()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -155,9 +158,11 @@ class MainActivity : ComponentActivity() {
                             confirmationText = "Param. autorisations"
                         )
                     } else if (sendingNotification) {
-                        notificationService.showBasicNotification(
+                        notificationService.send(
                             "Vous avez croisé quelqu'un",
-                            "Quelqu'un est a proximité, votre message personnalisé à été envoyé")
+                            "Quelqu'un est a proximité, votre message personnalisé à été envoyé",
+                            2
+                        )
                     } else {
                             if (showMessagePopup) {
                                 AlertDialog(
@@ -331,7 +336,7 @@ fun RootNavHost(){
         }
         composable("setting")
         {
-            SettingScreen(navController = navController, LocalContext.current)
+            SettingScreen(navController = navController, LocalContext.current, backgroundUse)
         }
     }
 }
