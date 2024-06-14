@@ -4,7 +4,7 @@
     <string name="messageListButton">Liste des messages reçus</string>
     <string name="nearbyDevice">Appareil(s) à proximité</string>
     <string name="searchingText">Recherche en cours...</string>
-    <string name="settingTitle">Paramètre</string>
+    <string name="settingTitle">Paramètres</string>
     <string name="backgroundAppText">Activer l\'app en arrière plan</string>
     <string name="nameSetting">Changer votre nom</string>
     <string name="messageSetting">Changer votre message à envoyer</string>
