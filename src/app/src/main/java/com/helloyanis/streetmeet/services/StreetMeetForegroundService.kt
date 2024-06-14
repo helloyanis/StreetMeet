@@ -1,4 +1,4 @@
-package com.helloyanis.streetmeet
+package com.helloyanis.streetmeet.services
 
 import android.app.NotificationManager
 import android.app.Service

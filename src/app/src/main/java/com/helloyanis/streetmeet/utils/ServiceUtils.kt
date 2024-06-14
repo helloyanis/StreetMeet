@@ -1,4 +1,4 @@
-package com.helloyanis.streetmeet
+package com.helloyanis.streetmeet.utils
 
 import android.app.ActivityManager
 import android.content.Context

@@ -1,7 +1,7 @@
-package com.helloyanis.streetmeet
+package com.helloyanis.streetmeet.utils
 
 import android.content.Context
-import android.widget.Toast
+import com.helloyanis.streetmeet.R
 
 class SharedPreferencesTalker(private val context: Context) {
     fun getMessageFromSharedPreferences(): String{

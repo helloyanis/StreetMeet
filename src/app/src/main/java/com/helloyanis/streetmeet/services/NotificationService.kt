@@ -1,11 +1,11 @@
-package com.helloyanis.streetmeet
+package com.helloyanis.streetmeet.services
 
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import kotlin.random.Random
+import com.helloyanis.streetmeet.R
 
 class NotificationService(
     private val context: Context,

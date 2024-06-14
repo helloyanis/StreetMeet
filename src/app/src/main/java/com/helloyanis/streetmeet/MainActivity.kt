@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.helloyanis.streetmeet.services.NotificationService
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 import com.helloyanis.streetmeet.view.MainScreen
 import com.helloyanis.streetmeet.view.MessageListScreen
@@ -71,7 +72,10 @@ class MainActivity : ComponentActivity() {
             StreetMeetTheme {
                 RootNavHost()
 
-                if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                if (checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
+                        android.Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
                     val appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
                         android.Manifest.permission.NEARBY_WIFI_DEVICES
@@ -105,11 +109,15 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val notificationService = NotificationService(this, getSystemService(
-                    NotificationManager::class.java)!!)
+                val notificationService = NotificationService(
+                    this, getSystemService(
+                        NotificationManager::class.java
+                    )!!
+                )
                 notificationService.createChannelNotification()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    // ----- Decoupe wifiAware check ---------
                     if (wifiAwareIncompatible) {
                         AlertDialog(
                             onDismissRequest = { finishAndRemoveTask() },
@@ -157,6 +165,7 @@ class MainActivity : ComponentActivity() {
                             icon = Icons.Default.Info,
                             confirmationText = "Param. autorisations"
                         )
+                        //---- Fin découpe WifiAware Check
                     } else if (sendingNotification) {
                         notificationService.send(
                             "Vous avez croisé quelqu'un",
@@ -164,27 +173,28 @@ class MainActivity : ComponentActivity() {
                             2
                         )
                     } else {
-                            if (showMessagePopup) {
-                                AlertDialog(
-                                    onDismissRequest = { showMessagePopup = false },
-                                    onConfirmation = {
-                                        showMessagePopup = false
-                                    },
-                                    dialogTitle = "Message reçu",
-                                    dialogText = messageText,
-                                    icon = Icons.Default.Info,
-                                    confirmationText = "OK"
-                                )
-                            }
-                            RootNavHost()
+                        if (showMessagePopup) {
+                            AlertDialog(
+                                onDismissRequest = { showMessagePopup = false },
+                                onConfirmation = {
+                                    showMessagePopup = false
+                                },
+                                dialogTitle = "Message reçu",
+                                dialogText = messageText,
+                                icon = Icons.Default.Info,
+                                confirmationText = "OK"
+                            )
+                        }
+                        RootNavHost()
 
 
                     }
                 }
             }
         }
-
-       val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
+        print("before wifiAware")
+        WifiAwareCallback(this).wifi()
+        /*val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
         if (hasSystemFeature && checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
                 //Log nearby devices
                 val wifiAwareManager =
@@ -316,8 +326,8 @@ class MainActivity : ComponentActivity() {
                 wifiAwareIncompatible = true
             }else {
                 wifiAwareScanFailed = true
-            }
-        }
+            }*/
+        println("after wifi Aware")
     }
 }
 

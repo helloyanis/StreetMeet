@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.R
-import com.helloyanis.streetmeet.ServiceUtils
-import com.helloyanis.streetmeet.SharedPreferencesTalker
-import com.helloyanis.streetmeet.StreetMeetForegroundService
+import com.helloyanis.streetmeet.utils.ServiceUtils
+import com.helloyanis.streetmeet.utils.SharedPreferencesTalker
+import com.helloyanis.streetmeet.services.StreetMeetForegroundService
 
 @Composable
 fun SettingScreen(navController: NavController, context: Context, backgroundUse: Boolean) {

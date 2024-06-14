@@ -1,4 +1,4 @@
-package com.helloyanis.streetmeet
+package com.helloyanis.streetmeet.model
 
 import java.time.LocalDateTime
 
