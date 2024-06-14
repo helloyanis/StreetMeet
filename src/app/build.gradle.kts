@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.helloyanis.streetmeet"
-        minSdk = 30
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -50,9 +50,10 @@ android {
 }
 
 dependencies {
-    implementation(libs.accompanist.permissions)
-    testImplementation(libs.mockk)
-    testImplementation(libs.robolectric)
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+    implementation(libs.androidx.navigation.compose)
+    testImplementation("io.mockk:mockk:1.12.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

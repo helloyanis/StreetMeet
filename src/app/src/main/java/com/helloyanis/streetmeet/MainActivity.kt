@@ -24,21 +24,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,24 +38,29 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
+import com.helloyanis.streetmeet.view.MainScreen
+import com.helloyanis.streetmeet.view.MessageListScreen
+import com.helloyanis.streetmeet.view.SettingScreen
 
-
+private var wifiAwareDisabledDialogVisible by mutableStateOf(false)
+private var wifiAwareScanFailed by mutableStateOf(false)
+private var wifiAwareIncompatible by mutableStateOf(false)
+var wifiAwareSubscribeStarted by mutableStateOf(false)
+var wifiAwarePublishStarted by mutableStateOf(false)
+private var sendingNotification by mutableStateOf(false)
+private var discoverySession: DiscoverySession? = null
+private var showMessagePopup by mutableStateOf(false)
+private var messageText by mutableStateOf("")
+var nearbyDevicesAmount by mutableStateOf(0)
+private var backgroundUse by mutableStateOf(false)
 class MainActivity : ComponentActivity() {
-    private var wifiAwareDisabledDialogVisible by mutableStateOf(false)
-    private var wifiAwareScanFailed by mutableStateOf(false)
-    private var wifiAwareIncompatible by mutableStateOf(false)
-    private var wifiAwareSubscribeStarted by mutableStateOf(false)
-    private var wifiAwarePublishStarted by mutableStateOf(false)
-    private var sendingNotification by mutableStateOf(false)
-    private var discoverySession: DiscoverySession? = null
-    private var showMessagePopup by mutableStateOf(false)
-    private var messageText by mutableStateOf("")
-    private var backgroundUse by mutableStateOf(false)
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +69,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
+                RootNavHost()
+
                 if(checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                     val appPermission = arrayOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
@@ -95,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                 this.startActivity(intent)
                                 this.finishAffinity()
                             } else {
-                               wifiAwareScanFailed = true
+                                wifiAwareScanFailed = true
 
                             }
                         }
@@ -105,11 +104,9 @@ class MainActivity : ComponentActivity() {
                         appPermissionLauncher.launch(appPermission)
                     }
                 }
-                
-                val notificationService = NotificationService(
-                    this,
-                    this.getSystemService(NotificationManager::class.java)
-                )
+
+                val notificationService = NotificationService(this, getSystemService(
+                    NotificationManager::class.java)!!)
                 notificationService.createChannelNotification()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -162,53 +159,11 @@ class MainActivity : ComponentActivity() {
                         )
                     } else if (sendingNotification) {
                         notificationService.send(
-                            title = "Vous avez croisé quelqu'un",
-                            content = "Quelqu'un est a proximité, votre message personnalisé à été envoyé"
+                            "Vous avez croisé quelqu'un",
+                            "Quelqu'un est a proximité, votre message personnalisé à été envoyé",
+                            2
                         )
                     } else {
-                        Column(modifier = Modifier.padding(innerPadding)) {
-                            if (wifiAwareSubscribeStarted) {
-                                Text("Recherche d'appareils à proximité...",
-                                    modifier = Modifier.padding(innerPadding)
-
-                                )
-                            }
-                            if (wifiAwarePublishStarted) {
-                                Text("Envoi de votre présence aux appareils à proximité..."
-                                    , modifier = Modifier.padding(innerPadding))
-                            }
-                            Row(modifier = Modifier.padding(innerPadding), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Utiliser StreetMeet en arrière-plan",
-                                    modifier = Modifier.padding(innerPadding))
-                                Switch(
-                                    checked = backgroundUse,
-                                    onCheckedChange = {
-                                        backgroundUse = it
-                                        val context = applicationContext
-                                        if (backgroundUse) {
-                                            val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
-                                            context.startForegroundService(serviceIntent)
-                                        } else {
-                                            val serviceIntent = Intent(context, StreetMeetForegroundService::class.java)
-                                            context.stopService(serviceIntent)
-                                        }
-                                    },
-                                    modifier = Modifier.size(50.dp),
-                                    thumbContent = if (backgroundUse) {
-                                        {
-                                            Icon(
-                                                imageVector = Icons.Filled.Check,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(SwitchDefaults.IconSize),
-                                            )
-                                        }
-                                    } else {
-                                        null
-                                    }
-                                )
-                            }
-
-
                             if (showMessagePopup) {
                                 AlertDialog(
                                     onDismissRequest = { showMessagePopup = false },
@@ -221,14 +176,15 @@ class MainActivity : ComponentActivity() {
                                     confirmationText = "OK"
                                 )
                             }
-                        }
+                            RootNavHost()
+
 
                     }
                 }
             }
         }
 
-        val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
+       val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
         if (hasSystemFeature && checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
                 //Log nearby devices
                 val wifiAwareManager =
@@ -263,6 +219,7 @@ class MainActivity : ComponentActivity() {
                                     serviceSpecificInfo,
                                     matchFilter
                                 )
+                                nearbyDevicesAmount++
                                 println("1 Service discovered from peer: $peerHandle")
                                 Toast.makeText(
                                     applicationContext,
@@ -278,7 +235,10 @@ class MainActivity : ComponentActivity() {
                                 println("1Message sent to peer: $peerHandle")
 
                             }
-
+                            override fun onServiceLost(peerHandle: PeerHandle, reason: Int) {
+                                nearbyDevicesAmount--
+                                super.onServiceLost(peerHandle, reason)
+                            }
                             override fun onMessageReceived(
                                 peerHandle: PeerHandle,
                                 message: ByteArray
@@ -313,6 +273,7 @@ class MainActivity : ComponentActivity() {
                                     serviceSpecificInfo,
                                     matchFilter
                                 )
+                                nearbyDevicesAmount++
                                 println("Service discovered from peer: $peerHandle")
                                 Toast.makeText(
                                     applicationContext,
@@ -327,6 +288,11 @@ class MainActivity : ComponentActivity() {
                                     message.toByteArray()
                                 )
                                 println("Message sent to peer: $peerHandle : $message")
+                            }
+
+                            override fun onServiceLost(peerHandle: PeerHandle, reason: Int) {
+                                nearbyDevicesAmount--
+                                super.onServiceLost(peerHandle, reason)
                             }
                             override fun onMessageReceived(
                                 peerHandle: PeerHandle,
@@ -351,6 +317,26 @@ class MainActivity : ComponentActivity() {
             }else {
                 wifiAwareScanFailed = true
             }
+        }
+    }
+}
+
+@Composable
+fun RootNavHost(){
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "MainScreen"
+    ){
+        composable("mainScreen")
+        {
+            MainScreen(navController, wifiAwareSubscribeStarted, wifiAwarePublishStarted, nearbyDevicesAmount)
+        }
+        composable("messageList")
+        {
+            MessageListScreen(navController = navController)
+        }
+        composable("setting")
+        {
+            SettingScreen(navController = navController, LocalContext.current, backgroundUse)
         }
     }
 }

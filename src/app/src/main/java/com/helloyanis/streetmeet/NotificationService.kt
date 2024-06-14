@@ -13,7 +13,7 @@ class NotificationService(
 ) {
     fun createChannelNotification() {
         val notificationChannel = NotificationChannel(
-            "alertMeet",
+            "alertmeet",
             "Meet people",
             NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -21,22 +21,16 @@ class NotificationService(
         println("[INFO] Channel created")
     }
 
-    fun send(title: String, content: String): Pair<Int, Notification> {
-        val notification = NotificationCompat.Builder(context, "alertMeet")
+    fun send(title: String, content: String, notificationId: Int): Pair<Int, Notification> {
+        val builder = NotificationCompat.Builder(context, "alertmeet")
             .setContentTitle(title)
             .setContentText(content)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
+            .setSmallIcon(R.drawable.wifi_tethering)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
-            .build()
 
-        notificationManager.notify(
-            Random.nextInt(),
-            notification
-        )
-
-        val notificationId = Random.nextInt()
+        val notification = builder.build()
         notificationManager.notify(notificationId, notification)
-        return Pair(notificationId, notification)
+        return notificationId to notification
     }
 }

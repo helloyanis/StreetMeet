@@ -7,19 +7,25 @@ import android.os.IBinder
 
 class StreetMeetForegroundService : Service() {
     private lateinit var notificationService: NotificationService
+    private val notificationId = 1 // Utilisez un ID unique pour la notification
+
 
     override fun onCreate() {
         super.onCreate()
-        notificationService = NotificationService(
-            this,
-            this.getSystemService(NotificationManager::class.java)
-        )
+        notificationService = NotificationService(this, getSystemService(NotificationManager::class.java)!!)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if(intent?.action == "STOP") {
+            stopForeground(true) // Arrête le service au premier plan et supprime la notification
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        // Créez ou mettez à jour la notification
         notificationService.createChannelNotification()
-        val notification = notificationService.send("StreetMeet", "StreetMeet is running")
-        startForeground(notification.first, notification.second)
+        val notification = notificationService.send("StreetMeet", "StreetMeet is running", notificationId)
+        startForeground(notificationId, notification.second)
         return START_STICKY
     }
 
@@ -31,4 +37,5 @@ class StreetMeetForegroundService : Service() {
         stopForeground(true)
         super.onDestroy()
     }
+
 }
