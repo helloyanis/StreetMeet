@@ -39,13 +39,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.R
+import com.helloyanis.streetmeet.ServiceUtils
 import com.helloyanis.streetmeet.SharedPreferencesTalker
 import com.helloyanis.streetmeet.StreetMeetForegroundService
 
 @Composable
 fun SettingScreen(navController: NavController, context: Context, backgroundUse: Boolean) {
+    val appContext = LocalContext.current
+    var backgroundService by remember {
+        mutableStateOf(StreetMeetForegroundService())
+    }
     var backgroundCheck by remember {
-        mutableStateOf(backgroundUse)
+        mutableStateOf(ServiceUtils.isServiceRunning(appContext, StreetMeetForegroundService::class.java))
     }
     var showDialogWithReason by remember {
         mutableStateOf("none")
@@ -98,7 +103,7 @@ fun SettingScreen(navController: NavController, context: Context, backgroundUse:
                 Modifier.padding(end = 10.dp),
                 fontSize = 20.sp
             )
-            val appContext = LocalContext.current
+            
             Switch(checked = backgroundCheck, onCheckedChange = {
                 backgroundCheck = it
                 if (backgroundCheck) {

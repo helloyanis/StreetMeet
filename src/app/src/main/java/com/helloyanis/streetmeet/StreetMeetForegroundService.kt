@@ -4,11 +4,11 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 
 class StreetMeetForegroundService : Service() {
     private lateinit var notificationService: NotificationService
     private val notificationId = 1 // Utilisez un ID unique pour la notification
+
 
     override fun onCreate() {
         super.onCreate()
@@ -26,7 +26,6 @@ class StreetMeetForegroundService : Service() {
         notificationService.createChannelNotification()
         val notification = notificationService.send("StreetMeet", "StreetMeet is running", notificationId)
         startForeground(notificationId, notification.second)
-
         return START_STICKY
     }
 
@@ -38,4 +37,5 @@ class StreetMeetForegroundService : Service() {
         stopForeground(true)
         super.onDestroy()
     }
+
 }
