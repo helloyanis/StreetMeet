@@ -1,37 +1,38 @@
 package com.helloyanis.streetmeet
 
-import io.mockk.every
-import io.mockk.just
+import android.app.Notification
+import android.app.NotificationManager
+import android.content.Context
+import androidx.core.app.NotificationCompat
 import io.mockk.mockk
-import io.mockk.runs
+import io.mockk.slot
 import io.mockk.verify
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34], manifest = Config.NONE)
+class NotificationUnitTest {
     @Test
-    fun notificationSending() {
-        val mockNotificationService = mockk<NotificationService>()
+    fun sendNotification() {
+        val mockContext = mockk<Context>(relaxed = true)
+        val mockNotificationManager = mockk<NotificationManager>(relaxed = true)
 
-        every { mockNotificationService.createChannelNotification() } just runs
-        every { mockNotificationService.showBasicNotification(
-            "Vous avez croisé quelqu'un",
-            "Nathan est a proximité, envoie lui un message") } just runs
+        val notificationService = NotificationService(mockContext, mockNotificationManager)
 
-        mockNotificationService.createChannelNotification()
-        mockNotificationService.showBasicNotification(
-            "Vous avez croisé quelqu'un",
-            "Nathan est a proximité, envoie lui un message"
-        )
+        val title = "Test notification"
+        val description = "Test description"
 
-        verify { mockNotificationService.createChannelNotification() }
-        verify { mockNotificationService.showBasicNotification(
-            "Vous avez croisé quelqu'un",
-            "Nathan est a proximité, envoie lui un message"
-        ) }
+        notificationService.send(title, description)
+
+        val slot = slot<Notification>()
+        verify { mockNotificationManager.notify(any(), capture(slot)) }
+
+        val capturedNotification = slot.captured
+        assertEquals(capturedNotification.extras.getString(NotificationCompat.EXTRA_TITLE), title)
+        assertEquals(capturedNotification.extras.getString(NotificationCompat.EXTRA_TEXT), description)
     }
 }
