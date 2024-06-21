@@ -10,4 +10,14 @@
     <string name="messageSetting">Change your message to send</string>
     <string name="backToMain">Return to the main screen</string>
     <string name="activationTimeSetting">Enter the activation time</string>
+    <string name="notificationTitle">You have meet someone</string>
+    <string name="notificationContent">Someone is nearby, your personnal message has been sent</string>
+    <string name="wifiAwareScanFailedTitle">insufficient authorization</string>
+    <string name="wifiAwareScanFailedContent">Please enable the nearby device detection in app settings</string>
+    <string name="wifiAwareDisabledTitle">Wi-Fi disable</string>
+    <string name="wifiAwareDisabledContent">Please enable Wi-Fi to use this functionnality. (no internet needed, only Wi-Fi</string>
+    <string name="wifiAwareIncompatibleTitle">Wi-Fi aware is incompatible</string>
+    <string name="wifiAwareIncompatibleContent">Your device is incompatible with this incompatible.</string>
+    <string name="wifiAwareIncompatibleMore">More informations</string>
+    <string name="wifiAwareDisabledEnable">Enable Wi-Fi</string>
 </resources>

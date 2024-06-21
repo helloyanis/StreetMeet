@@ -10,4 +10,14 @@
     <string name="messageSetting">Changer votre message à envoyer</string>
     <string name="backToMain">Retournez à l\'écran principal</string>
     <string name="activationTimeSetting">Tapez la durée d\'activation</string>
+    <string name="notificationTitle">Vous avez croisé quelqu\'un</string>
+    <string name="notificationContent">Quelqu\'un est a proximité, votre message personnalisé à été envoyé</string>
+    <string name="wifiAwareScanFailedTitle">Autorisations insuffisantes</string>
+    <string name="wifiAwareScanFailedContent">Veuillez activer la détection d\'appareils à proximité dans les paramètres de l\'application</string>
+    <string name="wifiAwareDisabledTitle">Wi-Fi désactivé</string>
+    <string name="wifiAwareIncompatibleTitle">Wi-Fi Aware incompatible</string>
+    <string name="wifiAwareIncompatibleContent">Votre appareil n\'est pas compatible avec cette fonctionnalité.</string>
+    <string name="wifiAwareDisabledContent">Veuillez activer le Wi-Fi utiliser cette fonctionnalité. (Pas besoin d\'Internet, juste d\'activer le Wi-Fi)</string>
+    <string name="wifiAwareIncompatibleMore">Plus d\'information</string>
+    <string name="wifiAwareDisabledEnable">Activer le Wi-Fi</string>
 </resources>

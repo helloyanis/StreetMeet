@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -129,10 +130,10 @@ class MainActivity : ComponentActivity() {
                                 startActivity(browserIntent)
                                 finishAndRemoveTask()
                             },
-                            dialogTitle = "Wi-Fi Aware incompatible",
-                            dialogText = "Votre appareil n'est pas compatible avec cette fonctionnalité.",
+                            dialogTitle = stringResource(id = R.string.wifiAwareIncompatibleTitle),
+                            dialogText = stringResource(id = R.string.wifiAwareIncompatibleContent),
                             icon = Icons.Default.Clear, // ou tout autre icône appropriée
-                            confirmationText = "Plus d'informations"
+                            confirmationText = stringResource(id = R.string.wifiAwareIncompatibleMore)
                         )
                     } else if (wifiAwareDisabledDialogVisible) {
                         AlertDialog(
@@ -147,10 +148,10 @@ class MainActivity : ComponentActivity() {
                             onConfirmation = {
                                 startActivity(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY))
                             },
-                            dialogTitle = "Wi-Fi désactivé",
-                            dialogText = "Veuillez activer le Wi-Fi utiliser cette fonctionnalité. (Pas besoin d'Internet, juste d'activer le Wi-Fi)",
+                            dialogTitle = stringResource(id = R.string.wifiAwareDisabledTitle),
+                            dialogText = stringResource(id = R.string.wifiAwareDisabledContent),
                             icon = Icons.Default.Info, // ou tout autre icône appropriée
-                            confirmationText = "Activer le Wi-Fi"
+                            confirmationText = stringResource(id = R.string.wifiAwareDisabledEnable)
                         )
                     } else if (wifiAwareScanFailed) {
                         AlertDialog(
@@ -160,16 +161,16 @@ class MainActivity : ComponentActivity() {
                                     data = Uri.fromParts("package", packageName, null)
                                 })
                             },
-                            dialogTitle = "Autorisations insuffisantes",
-                            dialogText = "Veuillez activer la détection d'appareils à proximité dans les paramètres de l'application",
+                            dialogTitle = stringResource(id = R.string.wifiAwareScanFailedTitle),
+                            dialogText = stringResource(id = R.string.wifiAwareScanFailedContent),
                             icon = Icons.Default.Info,
                             confirmationText = "Param. autorisations"
                         )
                         //---- Fin découpe WifiAware Check
                     } else if (sendingNotification) {
                         notificationService.send(
-                            "Vous avez croisé quelqu'un",
-                            "Quelqu'un est a proximité, votre message personnalisé à été envoyé",
+                            stringResource(id = R.string.notificationTitle),
+                            stringResource(id = R.string.notificationContent),
                             2
                         )
                     } else {
@@ -334,7 +335,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun RootNavHost(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "MainScreen"
+    NavHost(navController = navController, startDestination = "mainScreen"
     ){
         composable("mainScreen")
         {
