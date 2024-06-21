@@ -2,8 +2,10 @@ package com.helloyanis.streetmeet
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.wifi.aware.AttachCallback
@@ -137,12 +139,10 @@ class MainActivity : ComponentActivity() {
                     } else if (wifiAwareDisabledDialogVisible) {
                         AlertDialog(
                             onDismissRequest = {
-                                val intent = Intent(
-                                    this,
-                                    MainActivity::class.java
-                                )
-                                this.startActivity(intent)
-                                this.finishAffinity()
+                                //Check if Wi-Fi has been enabled
+                                wifiAwareDisabledDialogVisible = false
+
+
                             },
                             onConfirmation = {
                                 startActivity(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY))
@@ -194,15 +194,22 @@ class MainActivity : ComponentActivity() {
         }
         print("before wifiAware")
         WifiAwareCallback(this).wifi()
-        /*val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
+        val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
         if (hasSystemFeature && checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
                 //Log nearby devices
                 val wifiAwareManager =
                     getSystemService(Context.WIFI_AWARE_SERVICE) as WifiAwareManager
-                if (!wifiAwareManager.isAvailable) {
-                    wifiAwareDisabledDialogVisible = true
+            val filter = IntentFilter(WifiAwareManager.ACTION_WIFI_AWARE_STATE_CHANGED)
+            val myReceiver = object : BroadcastReceiver() {
+
+                override fun onReceive(context: Context, intent: Intent) {
+                    // discard current sessions
+                    wifiAwareDisabledDialogVisible = !wifiAwareManager.isAvailable
                 }
-                wifiAwareManager.attach(object : AttachCallback() {
+            }
+            this.registerReceiver(myReceiver, filter)
+
+            wifiAwareManager.attach(object : AttachCallback() {
                     override fun onAttached(session: WifiAwareSession) {
                         super.onAttached(session)
                         val publishConfig = PublishConfig.Builder()
@@ -322,11 +329,12 @@ class MainActivity : ComponentActivity() {
                         }
                 }, null)
         } else {
-            if(!hasSystemFeature) {
+            if (!hasSystemFeature) {
                 wifiAwareIncompatible = true
-            }else {
+            } else {
                 wifiAwareScanFailed = true
-            }*/
+            }
+        }
         println("after wifi Aware")
     }
 }
