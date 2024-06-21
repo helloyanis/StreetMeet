@@ -342,7 +342,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun RootNavHost(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "MainScreen"
+    NavHost(navController = navController, startDestination = "mainScreen"
     ){
         composable("mainScreen")
         {
