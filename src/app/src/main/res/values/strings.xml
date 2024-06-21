@@ -20,4 +20,5 @@
     <string name="wifiAwareIncompatibleContent">Your device is incompatible with this incompatible.</string>
     <string name="wifiAwareIncompatibleMore">More informations</string>
     <string name="wifiAwareDisabledEnable">Enable Wi-Fi</string>
+    <string name="wifiAwareScanFailedSettings">Autorization settings</string>
 </resources>

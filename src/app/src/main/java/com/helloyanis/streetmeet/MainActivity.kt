@@ -132,7 +132,7 @@ class MainActivity : ComponentActivity() {
                             },
                             dialogTitle = stringResource(id = R.string.wifiAwareIncompatibleTitle),
                             dialogText = stringResource(id = R.string.wifiAwareIncompatibleContent),
-                            icon = Icons.Default.Clear, // ou tout autre icône appropriée
+                            icon = Icons.Default.Clear,
                             confirmationText = stringResource(id = R.string.wifiAwareIncompatibleMore)
                         )
                     } else if (wifiAwareDisabledDialogVisible) {
@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity() {
                             },
                             dialogTitle = stringResource(id = R.string.wifiAwareDisabledTitle),
                             dialogText = stringResource(id = R.string.wifiAwareDisabledContent),
-                            icon = Icons.Default.Info, // ou tout autre icône appropriée
+                            icon = Icons.Default.Info,
                             confirmationText = stringResource(id = R.string.wifiAwareDisabledEnable)
                         )
                     } else if (wifiAwareScanFailed) {
@@ -164,7 +164,7 @@ class MainActivity : ComponentActivity() {
                             dialogTitle = stringResource(id = R.string.wifiAwareScanFailedTitle),
                             dialogText = stringResource(id = R.string.wifiAwareScanFailedContent),
                             icon = Icons.Default.Info,
-                            confirmationText = "Param. autorisations"
+                            confirmationText = stringResource(id = R.string.wifiAwareScanFailedSettings)
                         )
                         //---- Fin découpe WifiAware Check
                     } else if (sendingNotification) {

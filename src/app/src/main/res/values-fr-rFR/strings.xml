@@ -20,4 +20,5 @@
     <string name="wifiAwareDisabledContent">Veuillez activer le Wi-Fi utiliser cette fonctionnalité. (Pas besoin d\'Internet, juste d\'activer le Wi-Fi)</string>
     <string name="wifiAwareIncompatibleMore">Plus d\'information</string>
     <string name="wifiAwareDisabledEnable">Activer le Wi-Fi</string>
+    <string name="wifiAwareScanFailedSettings">Param. autorisations</string>
 </resources>
