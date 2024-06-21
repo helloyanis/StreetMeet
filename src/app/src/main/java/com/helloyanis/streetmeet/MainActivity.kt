@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
+                RootNavHost()
                 if (checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
                         android.Manifest.permission.POST_NOTIFICATIONS
                     ) != PackageManager.PERMISSION_GRANTED
@@ -100,7 +101,6 @@ class MainActivity : ComponentActivity() {
                     finishAndRemoveTask = { finishAndRemoveTask() },
                     context = LocalContext.current
                 )
-                RootNavHost()
             }
         }
         print("before wifiAware")
