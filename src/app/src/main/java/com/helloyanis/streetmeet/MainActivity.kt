@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.net.wifi.aware.AttachCallback
 import android.net.wifi.aware.DiscoverySession
 import android.net.wifi.aware.DiscoverySessionCallback
@@ -19,61 +18,40 @@ import android.net.wifi.aware.SubscribeDiscoverySession
 import android.net.wifi.aware.WifiAwareManager
 import android.net.wifi.aware.WifiAwareSession
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.services.NotificationService
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
-import com.helloyanis.streetmeet.view.MainScreen
-import com.helloyanis.streetmeet.view.MessageListScreen
-import com.helloyanis.streetmeet.view.SettingScreen
 
-private var wifiAwareDisabledDialogVisible by mutableStateOf(false)
-private var wifiAwareScanFailed by mutableStateOf(false)
-private var wifiAwareIncompatible by mutableStateOf(false)
+var wifiAwareDisabledDialogVisible by mutableStateOf(false)
+var wifiAwareScanFailed by mutableStateOf(false)
+var wifiAwareIncompatible by mutableStateOf(false)
 var wifiAwareSubscribeStarted by mutableStateOf(false)
 var wifiAwarePublishStarted by mutableStateOf(false)
-private var sendingNotification by mutableStateOf(false)
+var sendingNotification by mutableStateOf(false)
 private var discoverySession: DiscoverySession? = null
-private var showMessagePopup by mutableStateOf(false)
-private var messageText by mutableStateOf("")
-var nearbyDevicesAmount by mutableStateOf(0)
-private var backgroundUse by mutableStateOf(false)
+var showMessagePopup by mutableStateOf(false)
+var messageText by mutableStateOf("")
+var nearbyDevicesAmount by mutableIntStateOf(0)
+var backgroundUse by mutableStateOf(false)
 class MainActivity : ComponentActivity() {
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
-                RootNavHost()
-
                 if (checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
                         android.Manifest.permission.POST_NOTIFICATIONS
                     ) != PackageManager.PERMISSION_GRANTED
@@ -117,79 +95,12 @@ class MainActivity : ComponentActivity() {
                     )!!
                 )
                 notificationService.createChannelNotification()
-
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // ----- Decoupe wifiAware check ---------
-                    if (wifiAwareIncompatible) {
-                        AlertDialog(
-                            onDismissRequest = { finishAndRemoveTask() },
-                            onConfirmation = {
-                                val browserIntent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://developer.android.com/develop/connectivity/wifi/wifi-aware")
-                                )
-                                startActivity(browserIntent)
-                                finishAndRemoveTask()
-                            },
-                            dialogTitle = "Wi-Fi Aware incompatible",
-                            dialogText = "Votre appareil n'est pas compatible avec cette fonctionnalité.",
-                            icon = Icons.Default.Clear, // ou tout autre icône appropriée
-                            confirmationText = "Plus d'informations"
-                        )
-                    } else if (wifiAwareDisabledDialogVisible) {
-                        AlertDialog(
-                            onDismissRequest = {
-                                //Check if Wi-Fi has been enabled
-                                wifiAwareDisabledDialogVisible = false
-
-
-                            },
-                            onConfirmation = {
-                                startActivity(Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY))
-                            },
-                            dialogTitle = "Wi-Fi désactivé",
-                            dialogText = "Veuillez activer le Wi-Fi utiliser cette fonctionnalité. (Pas besoin d'Internet, juste d'activer le Wi-Fi)",
-                            icon = Icons.Default.Info, // ou tout autre icône appropriée
-                            confirmationText = "Activer le Wi-Fi"
-                        )
-                    } else if (wifiAwareScanFailed) {
-                        AlertDialog(
-                            onDismissRequest = { wifiAwareScanFailed = false },
-                            onConfirmation = {
-                                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", packageName, null)
-                                })
-                            },
-                            dialogTitle = "Autorisations insuffisantes",
-                            dialogText = "Veuillez activer la détection d'appareils à proximité dans les paramètres de l'application",
-                            icon = Icons.Default.Info,
-                            confirmationText = "Param. autorisations"
-                        )
-                        //---- Fin découpe WifiAware Check
-                    } else if (sendingNotification) {
-                        notificationService.send(
-                            "Vous avez croisé quelqu'un",
-                            "Quelqu'un est a proximité, votre message personnalisé à été envoyé",
-                            2
-                        )
-                    } else {
-                        if (showMessagePopup) {
-                            AlertDialog(
-                                onDismissRequest = { showMessagePopup = false },
-                                onConfirmation = {
-                                    showMessagePopup = false
-                                },
-                                dialogTitle = "Message reçu",
-                                dialogText = messageText,
-                                icon = Icons.Default.Info,
-                                confirmationText = "OK"
-                            )
-                        }
-                        RootNavHost()
-
-
-                    }
-                }
+                CheckState(
+                    notificationService = notificationService,
+                    finishAndRemoveTask = { finishAndRemoveTask() },
+                    context = LocalContext.current
+                )
+                RootNavHost()
             }
         }
         print("before wifiAware")
@@ -337,59 +248,4 @@ class MainActivity : ComponentActivity() {
         }
         println("after wifi Aware")
     }
-}
-
-@Composable
-fun RootNavHost(){
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "mainScreen"
-    ){
-        composable("mainScreen")
-        {
-            MainScreen(navController, wifiAwareSubscribeStarted, wifiAwarePublishStarted, nearbyDevicesAmount)
-        }
-        composable("messageList")
-        {
-            MessageListScreen(navController = navController)
-        }
-        composable("setting")
-        {
-            SettingScreen(navController = navController, LocalContext.current, backgroundUse)
-        }
-    }
-}
-
-
-@Composable
-fun AlertDialog(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
-    confirmationText: String = "OK",
-    icon: ImageVector,
-) {
-    AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text(confirmationText)
-            }
-        }
-    )
 }

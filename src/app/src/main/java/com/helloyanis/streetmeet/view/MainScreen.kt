@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.R
-import kotlin.coroutines.coroutineContext
 
 
 @Composable

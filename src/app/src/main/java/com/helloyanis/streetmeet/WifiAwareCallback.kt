@@ -30,7 +30,7 @@ class WifiAwareCallback(val context: Context) {
     fun wifi(){
         print("in wifi aware")
         val hasSystemFeature = context.packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
-        if (hasSystemFeature && context.checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
+        if (hasSystemFeature && context.checkSelfPermission(Manifest.permission.NEARBY_WIFI_DEVICES) == PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
             //Log nearby devices
             val wifiAwareManager =
                 context.getSystemService(Context.WIFI_AWARE_SERVICE) as WifiAwareManager
