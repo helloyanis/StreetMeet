@@ -12,19 +12,32 @@ import com.helloyanis.streetmeet.view.SettingScreen
 @Composable
 fun RootNavHost(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "mainScreen"
-    ){
+    NavHost(
+        navController = navController,
+        startDestination = "mainScreen"
+    ) {
         composable("mainScreen")
         {
-            MainScreen(navController, wifiAwareSubscribeStarted, wifiAwarePublishStarted, nearbyDevicesAmount)
+            MainScreen(
+                navController,
+                wifiAwareSubscribeStarted,
+                wifiAwarePublishStarted,
+                nearbyDevicesAmount
+            )
         }
+
         composable("messageList")
         {
-            MessageListScreen(navController = navController)
+            MessageListScreen(navController)
         }
+
         composable("setting")
         {
-            SettingScreen(navController = navController, LocalContext.current, backgroundUse)
+            SettingScreen(
+                navController,
+                LocalContext.current,
+                backgroundUse
+            )
         }
     }
 }

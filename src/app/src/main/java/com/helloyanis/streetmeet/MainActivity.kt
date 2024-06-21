@@ -47,8 +47,8 @@ var showMessagePopup by mutableStateOf(false)
 var messageText by mutableStateOf("")
 var nearbyDevicesAmount by mutableIntStateOf(0)
 var backgroundUse by mutableStateOf(false)
-class MainActivity : ComponentActivity() {
 
+class MainActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
