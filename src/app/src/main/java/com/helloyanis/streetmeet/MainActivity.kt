@@ -24,11 +24,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.helloyanis.streetmeet.services.NotificationService
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
@@ -52,55 +55,58 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StreetMeetTheme {
-                RootNavHost()
-                if (checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
-                        android.Manifest.permission.POST_NOTIFICATIONS
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    val appPermission = arrayOf(
-                        android.Manifest.permission.POST_NOTIFICATIONS,
-                        android.Manifest.permission.NEARBY_WIFI_DEVICES
-                    )
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    RootNavHost()
+                    if (checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
+                            android.Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        val appPermission = arrayOf(
+                            android.Manifest.permission.POST_NOTIFICATIONS,
+                            android.Manifest.permission.NEARBY_WIFI_DEVICES
+                        )
 
-                    val appPermissionLauncher = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.RequestMultiplePermissions(),
-                        onResult = { permissions ->
-                            val permissionsGranted =
-                                permissions.values.reduce { acc, isPermissionGranted ->
-                                    acc && isPermissionGranted
+                        val appPermissionLauncher = rememberLauncherForActivityResult(
+                            contract = ActivityResultContracts.RequestMultiplePermissions(),
+                            onResult = { permissions ->
+                                val permissionsGranted =
+                                    permissions.values.reduce { acc, isPermissionGranted ->
+                                        acc && isPermissionGranted
+                                    }
+
+                                if (permissionsGranted) {
+                                    wifiAwareScanFailed = false
+                                    val intent = Intent(
+                                        this,
+                                        MainActivity::class.java
+                                    )
+                                    this.startActivity(intent)
+                                    this.finishAffinity()
+                                } else {
+                                    wifiAwareScanFailed = true
+
                                 }
-
-                            if (permissionsGranted) {
-                                wifiAwareScanFailed = false
-                                val intent = Intent(
-                                    this,
-                                    MainActivity::class.java
-                                )
-                                this.startActivity(intent)
-                                this.finishAffinity()
-                            } else {
-                                wifiAwareScanFailed = true
-
                             }
-                        }
-                    )
+                        )
 
-                    LaunchedEffect(Unit) {
-                        appPermissionLauncher.launch(appPermission)
+                        LaunchedEffect(Unit) {
+                            appPermissionLauncher.launch(appPermission)
+                        }
                     }
+
+                    val notificationService = NotificationService(
+                        this, getSystemService(
+                            NotificationManager::class.java
+                        )!!
+                    )
+                    notificationService.createChannelNotification()
+                    CheckState(
+                        notificationService = notificationService,
+                        finishAndRemoveTask = { finishAndRemoveTask() },
+                        context = LocalContext.current
+                    )
                 }
 
-                val notificationService = NotificationService(
-                    this, getSystemService(
-                        NotificationManager::class.java
-                    )!!
-                )
-                notificationService.createChannelNotification()
-                CheckState(
-                    notificationService = notificationService,
-                    finishAndRemoveTask = { finishAndRemoveTask() },
-                    context = LocalContext.current
-                )
             }
         }
         print("before wifiAware")
