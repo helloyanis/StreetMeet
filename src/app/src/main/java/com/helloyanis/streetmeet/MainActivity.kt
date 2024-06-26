@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
             StreetMeetTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     RootNavHost()
-                    /*if (checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
+                    if (checkSelfPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(
                             android.Manifest.permission.POST_NOTIFICATIONS
                         ) != PackageManager.PERMISSION_GRANTED
                     ) {
@@ -105,11 +105,11 @@ class MainActivity : ComponentActivity() {
                         notificationService = notificationService,
                         finishAndRemoveTask = { finishAndRemoveTask() },
                         context = LocalContext.current
-                    )*/
+                    )
                 }
             }
         }
-        /*print("before wifiAware")
+        print("before wifiAware")
         WifiAwareCallback(this).wifi()
         val hasSystemFeature = packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
         if (hasSystemFeature &&
@@ -256,6 +256,5 @@ class MainActivity : ComponentActivity() {
             }
         }
         println("after wifi Aware")
-         */
     }
 }
