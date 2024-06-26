@@ -10,4 +10,5 @@
     <string name="messageSetting">Change your message to send</string>
     <string name="backToMain">Return to the main screen</string>
     <string name="activationTimeSetting">Enter the activation time</string>
+    <string name="activationTimeSupportingText">0 means everytime activate</string>
 </resources>

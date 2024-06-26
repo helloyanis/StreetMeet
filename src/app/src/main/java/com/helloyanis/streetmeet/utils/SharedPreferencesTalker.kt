@@ -39,4 +39,21 @@ class SharedPreferencesTalker(private val context: Context) {
             apply()
         }
     }
+
+    fun getActivationTimeFromSharedPreferences(): Int {
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.sharedPreferencesMessageFileName), Context.MODE_PRIVATE
+        )
+        return sharedPreferences.getInt("time", 0)
+    }
+
+    fun setActivationTimeInSharedPreferences(time: Int) {
+        val sharedPreferences = context.getSharedPreferences(
+            context.getString(R.string.sharedPreferencesMessageFileName), Context.MODE_PRIVATE
+        )
+        with(sharedPreferences.edit()) {
+            putInt("time", time)
+            apply()
+        }
+    }
 }
