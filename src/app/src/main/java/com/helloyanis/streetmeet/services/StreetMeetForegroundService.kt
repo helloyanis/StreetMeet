@@ -21,6 +21,7 @@ class StreetMeetForegroundService : Service() {
             this,
             getSystemService(NotificationManager::class.java)!!
         )
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -42,6 +43,7 @@ class StreetMeetForegroundService : Service() {
                 stopSelf()
             }, durationMs)
         }
+
 
         return START_STICKY
     }

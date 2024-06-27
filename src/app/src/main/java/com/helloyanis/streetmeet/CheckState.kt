@@ -15,7 +15,9 @@ import com.helloyanis.streetmeet.view.AlertDialog
 fun CheckState(
     notificationService: NotificationService,
     finishAndRemoveTask: () -> Unit,
-    context: Context
+    context: Context,
+    notificationTitle: String,
+    notificationContent: String,
 ) {
     if (wifiAwareIncompatible) {
         AlertDialog(
@@ -62,22 +64,9 @@ fun CheckState(
         )
     } else if (sendingNotification) {
         notificationService.send(
-            "Vous avez croisé quelqu'un",
-            "Quelqu'un est a proximité, votre message personnalisé à été envoyé",
+            notificationTitle,
+            notificationContent,
             2
         )
-    } else {
-        if (showMessagePopup) {
-            AlertDialog(
-                onDismissRequest = { showMessagePopup = false },
-                onConfirmation = {
-                    showMessagePopup = false
-                },
-                dialogTitle = "Message reçu",
-                dialogText = messageText,
-                icon = Icons.Default.Info,
-                confirmationText = "OK"
-            )
-        }
     }
 }

@@ -25,6 +25,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.helloyanis.streetmeet.services.NotificationService
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
+import com.helloyanis.streetmeet.utils.SharedPreferencesTalker
+import com.helloyanis.streetmeet.view.AlertDialog
 
 var wifiAwareDisabledDialogVisible by mutableStateOf(false)
 var wifiAwareScanFailed by mutableStateOf(false)
@@ -104,8 +108,22 @@ class MainActivity : ComponentActivity() {
                     CheckState(
                         notificationService = notificationService,
                         finishAndRemoveTask = { finishAndRemoveTask() },
-                        context = LocalContext.current
+                        context = LocalContext.current,
+                        notificationTitle = "StreetMeet",
+                        notificationContent = messageText
                     )
+                    if (showMessagePopup) {
+                        AlertDialog(
+                            onDismissRequest = { showMessagePopup = false },
+                            onConfirmation = {
+                                showMessagePopup = false
+                            },
+                            dialogTitle = "Message reçu",
+                            dialogText = messageText,
+                            icon = Icons.Default.Info,
+                            confirmationText = "OK"
+                        )
+                    }
                 }
             }
         }
@@ -167,7 +185,7 @@ class MainActivity : ComponentActivity() {
                                 discoverySession?.sendMessage(
                                     peerHandle,
                                     0,
-                                    "Hello".toByteArray()
+                                    SharedPreferencesTalker(applicationContext).getMessageFromSharedPreferences().toByteArray()
                                 )
                                 println("1Message sent to peer: $peerHandle")
 
@@ -218,7 +236,7 @@ class MainActivity : ComponentActivity() {
                                     Toast.LENGTH_LONG
                                 ).show()
                                 sendingNotification = true
-                                val message = "Hi there"
+                                val message = SharedPreferencesTalker(applicationContext).getMessageFromSharedPreferences()
                                 discoverySession?.sendMessage(
                                     peerHandle,
                                     0,
