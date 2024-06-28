@@ -11,4 +11,7 @@
     <string name="backToMain">Return to the main screen</string>
     <string name="activationTimeSetting">Enter the activation time</string>
     <string name="activationTimeSupportingText">0 means everytime activate</string>
+    <string name="editMessageSetting">Edit your message</string>
+    <string name="editNameSetting">Edit your name</string>
+    <string name="messageAt">at</string>
 </resources>

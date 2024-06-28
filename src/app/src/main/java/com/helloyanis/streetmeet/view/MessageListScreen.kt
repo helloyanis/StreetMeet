@@ -60,7 +60,8 @@ fun MessageListScreen(navController: NavController){
                     Modifier
                         .fillMaxSize()
                         .padding(horizontal = 20.dp, vertical = 10.dp)) {
-                    Text(text = "${messages[it].emitter}, ${messages[it].dateTime.dayOfMonth}/${messages[it].dateTime.monthValue}/${messages[it].dateTime.year} à ${messages[it].dateTime.hour}:${messages[it].dateTime.minute}")
+                    Text(text = "${messages[it].emitter}, ${messages[it].dateTime.dayOfMonth}/${messages[it].dateTime.monthValue}/${messages[it].dateTime.year} "
+                            + stringResource(id = R.string.messageAt) + " ${messages[it].dateTime.hour}:${messages[it].dateTime.minute}")
                     Text(
                         text = messages[it].content,
                         Modifier

@@ -119,7 +119,12 @@ fun MainScreen(
 @Preview
 @Composable
 fun Preview(){
-    MainScreen(rememberNavController(), wifiAwarePublishStarted = false, wifiAwareSubscribeStarted = false, nearbyDevicesAmount = 0)
+    MainScreen(
+        rememberNavController(),
+        wifiAwarePublishStarted = false,
+        wifiAwareSubscribeStarted = false,
+        nearbyDevicesAmount = 0
+    )
 }
 
 @Composable

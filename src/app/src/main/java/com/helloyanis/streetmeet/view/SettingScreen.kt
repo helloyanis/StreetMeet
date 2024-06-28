@@ -60,7 +60,7 @@ fun SettingScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "Settings") },
+                title = { Text(text = stringResource(id = R.string.settingTitle)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
@@ -220,8 +220,8 @@ fun SettingScreen(
                     Text(
                         text =
                             when (showDialogWithReason) {
-                                "name" -> "Edit your name"
-                                "message" -> "Edit your message"
+                                "name" -> stringResource(id = R.string.editNameSetting)
+                                "message" -> stringResource(id = R.string.editMessageSetting)
                                 else -> ""
                             }
                     )
