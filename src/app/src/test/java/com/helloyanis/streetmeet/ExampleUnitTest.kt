@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
+import com.helloyanis.streetmeet.services.NotificationService
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify

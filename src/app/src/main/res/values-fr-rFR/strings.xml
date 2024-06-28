@@ -10,4 +10,5 @@
     <string name="messageSetting">Changer votre message à envoyer</string>
     <string name="backToMain">Retournez à l\'écran principal</string>
     <string name="activationTimeSetting">Tapez la durée d\'activation</string>
+    <string name="activationTimeSupportingText">0 = tout le temps activé</string>
 </resources>
