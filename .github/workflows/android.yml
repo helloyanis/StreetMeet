@@ -22,7 +22,7 @@ jobs:
         distribution: 'adopt'
 
     - name: Gradle Build Action
-      run: gradle/gradle-build-action@v3.4.2
+      run: gradle/gradle-build-action@v3
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.3.3
