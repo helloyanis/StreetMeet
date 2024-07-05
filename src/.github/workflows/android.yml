@@ -29,10 +29,10 @@ jobs:
         build-scan-terms-of-use-agree: "yes"
 
     - name: Grant execute permission for gradlew
-      run: chmod +x ./src/gradlew
+      run: chmod +x ./gradlew
 
     - name: Run build
-      run: ./src/gradlew build
+      run: ./gradlew build
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.3.3
