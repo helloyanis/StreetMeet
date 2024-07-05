@@ -15,17 +15,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4.1.0
       
-    - name: set up JDK
-      uses: actions/setup-java@v3.13.0
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4.2.1
       with:
         java-version: '17'
         distribution: 'adopt'
 
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: Gradle Build Action
+      run: gradle/gradle-build-action@v3.4.2
 
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4.3.3
       with:
         name: StreetMeet.apk
         path: app/build/outputs/apk/app-debug.apk
