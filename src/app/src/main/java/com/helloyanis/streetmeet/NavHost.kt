@@ -5,6 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.helloyanis.streetmeet.utils.DataStoreTalker
 import com.helloyanis.streetmeet.view.MainScreen
 import com.helloyanis.streetmeet.view.MessageListScreen
 import com.helloyanis.streetmeet.view.SettingScreen
@@ -34,7 +35,7 @@ fun RootNavHost(){
             SettingScreen(
                 navController,
                 LocalContext.current,
-                backgroundUse
+                DataStoreTalker(LocalContext.current)
             )
         }
     }

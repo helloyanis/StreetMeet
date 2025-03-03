@@ -30,16 +30,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.lifecycleScope
 import com.helloyanis.streetmeet.services.NotificationService
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
 import com.helloyanis.streetmeet.utils.DataStoreTalker
 import com.helloyanis.streetmeet.view.AlertDialog
+import kotlinx.coroutines.launch
 
 var wifiAwareDisabledDialogVisible by mutableStateOf(false)
 var wifiAwareMissingPermission by mutableStateOf(false)
@@ -53,6 +59,8 @@ var showMessagePopup by mutableStateOf(false)
 var messageText by mutableStateOf("")
 var nearbyDevicesAmount by mutableIntStateOf(0)
 var backgroundUse by mutableStateOf(false)
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -158,7 +166,6 @@ class MainActivity : ComponentActivity() {
                         val publishConfig = PublishConfig.Builder()
                             .setServiceName("com.helloyanis.streetmeet")
                             .build()
-
                         session.publish(publishConfig, object : DiscoverySessionCallback() {
 
 
@@ -188,15 +195,21 @@ class MainActivity : ComponentActivity() {
                                     Toast.LENGTH_LONG
                                 ).show()
                                 // Envoyer le message en utilisant la variable de membre discoverySession
-                                val message = DataStoreTalker(applicationContext).messageValue
-                                discoverySession?.sendMessage(
-                                    peerHandle,
-                                    0,
-                                    message.toByteArray()
-                                )
+                                val dataStoreTalker = DataStoreTalker(applicationContext)
 
-                                println("1Message sent to peer: $peerHandle")
+                                lifecycleScope.launch {
+                                    dataStoreTalker.messageFlow.collect { message ->
+                                        // Use the message here
+                                        println("Message: $message")
+                                        discoverySession?.sendMessage(
+                                            peerHandle,
+                                            0,
+                                            message.toByteArray()
+                                        )
 
+                                        println("1Message sent to peer: $peerHandle")
+                                    }
+                                }
                             }
                             override fun onServiceLost(peerHandle: PeerHandle, reason: Int) {
                                 nearbyDevicesAmount--
@@ -244,13 +257,22 @@ class MainActivity : ComponentActivity() {
                                     Toast.LENGTH_LONG
                                 ).show()
                                 sendingNotification = true
-                                val message = DataStoreTalker(applicationContext).messageValue
-                                discoverySession?.sendMessage(
-                                    peerHandle,
-                                    0,
-                                    message.toByteArray()
-                                )
-                                println("Message sent to peer: $peerHandle : $message")
+                                // Envoyer le message en utilisant la variable de membre discoverySession
+                                val dataStoreTalker = DataStoreTalker(applicationContext)
+
+                                lifecycleScope.launch {
+                                    dataStoreTalker.messageFlow.collect { message ->
+                                        // Use the message here
+                                        println("Message: $message")
+                                        discoverySession?.sendMessage(
+                                            peerHandle,
+                                            0,
+                                            message.toByteArray()
+                                        )
+
+                                        println("1Message sent to peer: $peerHandle")
+                                    }
+                                }
                             }
 
                             override fun onServiceLost(peerHandle: PeerHandle, reason: Int) {

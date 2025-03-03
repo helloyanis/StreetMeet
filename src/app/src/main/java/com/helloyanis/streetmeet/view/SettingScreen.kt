@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 fun SettingScreen(
     navController: NavController,
     context: Context,
-    backgroundUse: Boolean
+    dataStoreTalker: DataStoreTalker
 ) {
     Scaffold(
         topBar = {
@@ -88,17 +88,18 @@ fun SettingScreen(
         var showDialogWithReason by remember {
             mutableStateOf("none")
         }
-        var name by remember { mutableStateOf(DataStoreTalker(appContext).nameValue) }
-        var message by remember { mutableStateOf(DataStoreTalker(appContext).messageValue) }
-        var activationTime by remember { mutableIntStateOf(DataStoreTalker(appContext).activationTimeValue.toIntOrNull()?:0) }
+        var name by remember { mutableStateOf("Loading...") }
+        var message by remember { mutableStateOf("Loading...") }
+        var activationTime by remember { mutableIntStateOf( 0) }
+
         LaunchedEffect(Unit) {
-            DataStoreTalker(context).nameFlow.collect { value ->
+            dataStoreTalker.nameFlow.collect { value ->
                 name = value
             }
-            DataStoreTalker(context).messageFlow.collect { value ->
+            dataStoreTalker.messageFlow.collect { value ->
                 message = value
             }
-            DataStoreTalker(context).activationTimeFlow.collect { value ->
+            dataStoreTalker.activationTimeFlow.collect { value ->
                 activationTime = value
             }
         }
@@ -166,7 +167,7 @@ fun SettingScreen(
                     onValueChange = {
                         activationTime = it.toIntOrNull() ?: 0
                         coroutineScope.launch {
-                            DataStoreTalker(context).setActivationTimeInDataStore(activationTime)
+                            dataStoreTalker.setActivationTimeInDataStore(activationTime)
                         }
                     },
                     suffix = {
@@ -205,10 +206,8 @@ fun SettingScreen(
                     TextButton(
                         onClick = {
                             coroutineScope.launch {
-                                DataStoreTalker(context)
-                                .setMessageInDataStore(message)
-                                DataStoreTalker(context)
-                                .setNameInDataStore(name)
+                                dataStoreTalker.setMessageInDataStore(message)
+                                dataStoreTalker.setNameInDataStore(name)
                             }
                             showDialogWithReason = "none"
                         }
@@ -230,11 +229,11 @@ fun SettingScreen(
                 title = {
                     Text(
                         text =
-                            when (showDialogWithReason) {
-                                "name" -> stringResource(id = R.string.editNameSetting)
-                                "message" -> stringResource(id = R.string.editMessageSetting)
-                                else -> ""
-                            }
+                        when (showDialogWithReason) {
+                            "name" -> stringResource(id = R.string.editNameSetting)
+                            "message" -> stringResource(id = R.string.editMessageSetting)
+                            else -> ""
+                        }
                     )
                 },
                 text = {
@@ -246,8 +245,19 @@ fun SettingScreen(
                         },
                         onValueChange = { value ->
                             when (showDialogWithReason) {
-                                "name" -> name = value
-                                "message" -> message = value
+                                "name" -> {
+                                    name = value
+                                    coroutineScope.launch {
+                                        dataStoreTalker.setNameInDataStore(name)
+                                    }
+
+                                }
+                                "message" -> {
+                                    message = value
+                                    coroutineScope.launch {
+                                        dataStoreTalker.setMessageInDataStore(message)
+                                    }
+                                }
                             }
                         }
                     )
@@ -255,10 +265,4 @@ fun SettingScreen(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun SettingPreview() {
-    SettingScreen(rememberNavController(), LocalContext.current, true)
 }

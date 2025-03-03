@@ -40,15 +40,6 @@ package com.helloyanis.streetmeet.utils
                     preferences[TIME_KEY] ?: 0
                 }
 
-            val messageValue: String
-                get() = messageFlow.toString()
-
-            val nameValue: String
-                get() = nameFlow.toString()
-
-            val activationTimeValue: String
-                get() = activationTimeFlow.toString()
-
             suspend fun setMessageInDataStore(newMessage: String) {
                 context.dataStore.edit { preferences ->
                     preferences[MESSAGE_KEY] = newMessage
