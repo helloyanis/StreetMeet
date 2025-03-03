@@ -146,7 +146,7 @@ class MainActivity : ComponentActivity() {
             val myReceiver = object : BroadcastReceiver() {
 
                 override fun onReceive(context: Context, intent: Intent) {
-                    // discard current sessions
+                    // Check if wifi has been enabled after initial check
                     wifiAwareDisabledDialogVisible = !wifiAwareManager.isAvailable
                 }
             }
