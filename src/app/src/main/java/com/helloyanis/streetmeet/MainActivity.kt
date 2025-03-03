@@ -23,6 +23,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -37,12 +38,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.helloyanis.streetmeet.services.NotificationService
 import com.helloyanis.streetmeet.ui.theme.StreetMeetTheme
-import com.helloyanis.streetmeet.utils.SharedPreferencesTalker
+import com.helloyanis.streetmeet.utils.DataStoreTalker
 import com.helloyanis.streetmeet.view.AlertDialog
 
 var wifiAwareDisabledDialogVisible by mutableStateOf(false)
-var wifiAwareScanFailed by mutableStateOf(false)
+var wifiAwareMissingPermission by mutableStateOf(false)
 var wifiAwareIncompatible by mutableStateOf(false)
+var wifiAwareAttachFailed by mutableStateOf(false)
 var wifiAwareSubscribeStarted by mutableStateOf(false)
 var wifiAwarePublishStarted by mutableStateOf(false)
 var sendingNotification by mutableStateOf(false)
@@ -52,8 +54,10 @@ var messageText by mutableStateOf("")
 var nearbyDevicesAmount by mutableIntStateOf(0)
 var backgroundUse by mutableStateOf(false)
 
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 class MainActivity : ComponentActivity() {
+    private lateinit var appPermissionLauncher: ActivityResultLauncher<Array<String>>
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +84,7 @@ class MainActivity : ComponentActivity() {
                                     }
 
                                 if (permissionsGranted) {
-                                    wifiAwareScanFailed = false
+                                    wifiAwareMissingPermission = false
                                     val intent = Intent(
                                         this,
                                         MainActivity::class.java
@@ -88,7 +92,7 @@ class MainActivity : ComponentActivity() {
                                     this.startActivity(intent)
                                     this.finishAffinity()
                                 } else {
-                                    wifiAwareScanFailed = true
+                                    wifiAwareMissingPermission = true
 
                                 }
                             }
@@ -138,6 +142,7 @@ class MainActivity : ComponentActivity() {
                 val wifiAwareManager =
                     getSystemService(Context.WIFI_AWARE_SERVICE) as WifiAwareManager
             val filter = IntentFilter(WifiAwareManager.ACTION_WIFI_AWARE_STATE_CHANGED)
+            wifiAwareDisabledDialogVisible = !wifiAwareManager.isAvailable
             val myReceiver = object : BroadcastReceiver() {
 
                 override fun onReceive(context: Context, intent: Intent) {
@@ -164,6 +169,7 @@ class MainActivity : ComponentActivity() {
                                 discoverySession = session
                             }
 
+
                             override fun onServiceDiscovered(
                                 peerHandle: PeerHandle,
                                 serviceSpecificInfo: ByteArray?,
@@ -182,11 +188,13 @@ class MainActivity : ComponentActivity() {
                                     Toast.LENGTH_LONG
                                 ).show()
                                 // Envoyer le message en utilisant la variable de membre discoverySession
+                                val message = DataStoreTalker(applicationContext).messageValue
                                 discoverySession?.sendMessage(
                                     peerHandle,
                                     0,
-                                    SharedPreferencesTalker(applicationContext).getMessageFromSharedPreferences().toByteArray()
+                                    message.toByteArray()
                                 )
+
                                 println("1Message sent to peer: $peerHandle")
 
                             }
@@ -236,7 +244,7 @@ class MainActivity : ComponentActivity() {
                                     Toast.LENGTH_LONG
                                 ).show()
                                 sendingNotification = true
-                                val message = SharedPreferencesTalker(applicationContext).getMessageFromSharedPreferences()
+                                val message = DataStoreTalker(applicationContext).messageValue
                                 discoverySession?.sendMessage(
                                     peerHandle,
                                     0,
@@ -265,12 +273,18 @@ class MainActivity : ComponentActivity() {
                         }, null)
 
                         }
+
+                override fun onAttachFailed() {
+                    wifiAwareAttachFailed = true
+                    unregisterReceiver(myReceiver)
+                    super.onAttachFailed()
+                }
                 }, null)
         } else {
             if (!hasSystemFeature) {
                 wifiAwareIncompatible = true
             } else {
-                wifiAwareScanFailed = true
+                wifiAwareMissingPermission = true
             }
         }
         println("after wifi Aware")

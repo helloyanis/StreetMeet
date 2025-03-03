@@ -31,15 +31,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.R
+import com.helloyanis.streetmeet.wifiAwarePublishStarted
+import com.helloyanis.streetmeet.wifiAwareSubscribeStarted
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavController,
-    wifiAwareSubscribeStarted: Boolean,
-    wifiAwarePublishStarted: Boolean,
-    nearbyDevicesAmount: Int
+    nearbyDevicesAmount: Int,
 ) {
     Scaffold(
         topBar = {
@@ -98,6 +98,11 @@ fun MainScreen(
                     text = stringResource(id = R.string.searchingText),
                     fontSize = 40.sp
                 )
+            }else{
+                Text(
+                    text = stringResource(id = R.string.startText),
+                    fontSize = 40.sp
+                )
             }
             Spacer(modifier = Modifier.weight(0.3f))
             Button(
@@ -121,8 +126,6 @@ fun MainScreen(
 fun Preview(){
     MainScreen(
         rememberNavController(),
-        wifiAwarePublishStarted = false,
-        wifiAwareSubscribeStarted = false,
         nearbyDevicesAmount = 0
     )
 }

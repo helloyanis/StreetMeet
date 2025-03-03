@@ -6,9 +6,9 @@ import android.content.Context
 object ServiceUtils {
     fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val services = activityManager.getRunningServices(Int.MAX_VALUE)
-        for (runningService in services) {
-            if (serviceClass.name == runningService.service.className) {
+        val runningAppProcesses = activityManager.runningAppProcesses
+        for (processInfo in runningAppProcesses) {
+            if (processInfo.processName == serviceClass.name) {
                 return true
             }
         }

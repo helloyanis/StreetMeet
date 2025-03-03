@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.wifi.aware.*
@@ -13,6 +14,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.helloyanis.streetmeet.R
@@ -48,7 +50,7 @@ class StreetMeetForegroundService : Service() {
 
         val powerManager = getSystemService(POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "StreetMeet::WakelockTag")
-        wakeLock?.acquire()
+        wakeLock?.acquire(10*60*1000L /*10 minutes*/)
 
         wifiAwareManager = getSystemService(WIFI_AWARE_SERVICE) as WifiAwareManager
         wifiAwareManager!!.attach(object : AttachCallback() {
@@ -59,6 +61,7 @@ class StreetMeetForegroundService : Service() {
             }
 
             override fun onAttachFailed() {
+                Log.e(TAG, "Wi-Fi Aware Attach Failed: ${wifiAwareManager!!.isAvailable}")
                 Toast.makeText(applicationContext, "Wi-Fi Aware Attach Failed", Toast.LENGTH_SHORT).show()
             }
         }, null)

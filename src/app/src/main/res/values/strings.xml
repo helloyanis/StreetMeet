@@ -10,8 +10,23 @@
     <string name="messageSetting">Change your message to send</string>
     <string name="backToMain">Return to the main screen</string>
     <string name="activationTimeSetting">Enter the activation time</string>
-    <string name="activationTimeSupportingText">0 means everytime activate</string>
+    <string name="activationTimeSupportingText">0 means always activate</string>
     <string name="editMessageSetting">Edit your message</string>
     <string name="editNameSetting">Edit your name</string>
     <string name="messageAt">at</string>
+    <string name="noName">Failed to get name</string>
+    <string name="noMessage">Failed to get message</string>
+    <string name="startText">Search is disabled</string>
+    <string name="wifiAwareIncompatibleDialogTitle">Wi-Fi Aware incompatible</string>
+    <string name="wifiAwareIncompatibleDialogText">You need a device that is compatible with Wi-Fi Aware to use this application.</string>
+    <string name="wifiAwareIncompatibleDialogConfirmationText">Learn more</string>
+    <string name="wifiAwareDisabledDialogTitle">Wi-Fi is disabled</string>
+    <string name="wifiAwareDisabledDialogText">You need to enable Wi-Fi to access this feature. (No need for an internet connection, just enable Wi-Fi!)</string>
+    <string name="wifiAwareDisabledDialogConfirmationText">Enable Wi-Fi</string>
+    <string name="wifiAwareMissingPermissionDialogTitle">Missing permissions</string>
+    <string name="wifiAwareMissingPermissionDialogText">You need to allow the nearby devices and notification permissons in the app\'s settings!</string>
+    <string name="wifiAwareMissingPermissionDialogConfirmationText">App settings</string>
+    <string name="wifiAwareAttachFailedDialogTitle">Failed to attach Wi-Fi Aware</string>
+    <string name="wifiAwareAttachFailedDialogText">Your device is compatible with Wi-Fi Aware, but initialization has failed! This should not happen, maybe a bug with your OS? Build the app for yourself and check the logcat for more info.</string>
+    <string name="wifiAwareAttachFailedDialogConfirmationText">See file triggering the error</string>
 </resources>

@@ -14,4 +14,9 @@
     <string name="editMessageSetting">Modifier votre message</string>
     <string name="editNameSetting">Modifier votre nom</string>
     <string name="messageAt">à</string>
+    <string name="noMessage">Echec d\'obtention du message</string>
+    <string name="startText">Search is disabled</string>
+    <string name="wifiAwareIncompatibleDialogTitle">Wi-Fi Aware incompatible</string>
+    <string name="noName">Echec d\'obtention du nom</string>
+    <string name="wifiAwareIncompatibleDialogText">Vous avez besoin d\'un appareil compatible Wi-Fi Aware pour utiliser cette application.</string>
 </resources>

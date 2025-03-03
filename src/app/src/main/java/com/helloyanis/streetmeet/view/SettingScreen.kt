@@ -29,10 +29,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +51,8 @@ import androidx.navigation.compose.rememberNavController
 import com.helloyanis.streetmeet.R
 import com.helloyanis.streetmeet.services.StreetMeetForegroundService
 import com.helloyanis.streetmeet.utils.ServiceUtils
-import com.helloyanis.streetmeet.utils.SharedPreferencesTalker
+import com.helloyanis.streetmeet.utils.DataStoreTalker
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +78,7 @@ fun SettingScreen(
         }
     ) { innerPadding ->
         val appContext = LocalContext.current
+        val coroutineScope = rememberCoroutineScope()
         var backgroundService by remember {
             mutableStateOf(StreetMeetForegroundService())
         }
@@ -83,14 +88,19 @@ fun SettingScreen(
         var showDialogWithReason by remember {
             mutableStateOf("none")
         }
-        var name by remember {
-            mutableStateOf(SharedPreferencesTalker(context).getNameFromSharedPreferences())
-        }
-        var message by remember {
-            mutableStateOf(SharedPreferencesTalker(context).getMessageFromSharedPreferences())
-        }
-        var activationTime by remember {
-            mutableIntStateOf(SharedPreferencesTalker(context).getActivationTimeFromSharedPreferences())
+        var name by remember { mutableStateOf(DataStoreTalker(appContext).nameValue) }
+        var message by remember { mutableStateOf(DataStoreTalker(appContext).messageValue) }
+        var activationTime by remember { mutableIntStateOf(DataStoreTalker(appContext).activationTimeValue.toIntOrNull()?:0) }
+        LaunchedEffect(Unit) {
+            DataStoreTalker(context).nameFlow.collect { value ->
+                name = value
+            }
+            DataStoreTalker(context).messageFlow.collect { value ->
+                message = value
+            }
+            DataStoreTalker(context).activationTimeFlow.collect { value ->
+                activationTime = value
+            }
         }
 
         Column(
@@ -155,8 +165,9 @@ fun SettingScreen(
                     value = activationTime.toString(),
                     onValueChange = {
                         activationTime = it.toIntOrNull() ?: 0
-                        SharedPreferencesTalker(context)
-                            .setActivationTimeInSharedPreferences(activationTime)
+                        coroutineScope.launch {
+                            DataStoreTalker(context).setActivationTimeInDataStore(activationTime)
+                        }
                     },
                     suffix = {
                         Text(text = "minutes")
@@ -193,11 +204,11 @@ fun SettingScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            when (showDialogWithReason) {
-                                "message" -> SharedPreferencesTalker(context)
-                                    .setMessageInSharedPreferences(message)
-                                "name" -> SharedPreferencesTalker(context)
-                                    .setNameInSharedPreferences(name)
+                            coroutineScope.launch {
+                                DataStoreTalker(context)
+                                .setMessageInDataStore(message)
+                                DataStoreTalker(context)
+                                .setNameInDataStore(name)
                             }
                             showDialogWithReason = "none"
                         }
@@ -235,8 +246,8 @@ fun SettingScreen(
                         },
                         onValueChange = { value ->
                             when (showDialogWithReason) {
-                                "name" -> if (value.length in 1..20) name = value
-                                "message" -> if (value.length in 1..100) message = value
+                                "name" -> name = value
+                                "message" -> message = value
                             }
                         }
                     )

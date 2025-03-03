@@ -20,8 +20,6 @@ fun RootNavHost(){
         {
             MainScreen(
                 navController,
-                wifiAwareSubscribeStarted,
-                wifiAwarePublishStarted,
                 nearbyDevicesAmount
             )
         }
